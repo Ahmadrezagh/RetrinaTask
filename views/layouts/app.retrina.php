@@ -176,30 +176,30 @@ $user = $isAuthenticated ? [
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5><i class="bi bi-code-slash"></i> Retrina Framework</h5>
-                    <p class="text-muted">A modern PHP framework with Laravel-like features.</p>
+                    <h5 class="text-white"><i class="bi bi-code-slash"></i> Retrina Framework</h5>
+                    <p class="text-white">A modern PHP framework with Laravel-like features.</p>
                 </div>
                 <div class="col-md-3">
-                    <h6>Quick Links</h6>
+                    <h6 class="text-white">Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li><a href="/docs" class="text-muted">Documentation</a></li>
-                        <li><a href="/api" class="text-muted">API Reference</a></li>
-                        <li><a href="/demo/template-syntax" class="text-muted">Demo</a></li>
+                        <li><a href="/docs" class="text-white">Documentation</a></li>
+                        <li><a href="/api" class="text-white">API Reference</a></li>
+                        <li><a href="/demo/template-syntax" class="text-white">Demo</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h6>Resources</h6>
+                    <h6 class="text-white">Resources</h6>
                     <ul class="list-unstyled">
-                        <li><a href="https://github.com" class="text-muted">GitHub</a></li>
-                        <li><a href="/contact" class="text-muted">Contact</a></li>
-                        <li><a href="/about" class="text-muted">About</a></li>
+                        <li><a href="https://github.com/Ahmadrezagh/RetrinaTask" class="text-white">GitHub</a></li>
+                        <li><a href="mailto:contact@ahmadreza.dev" class="text-white">Contact</a></li>
+                        <li><a href="/about" class="text-white">About</a></li>
                     </ul>
                 </div>
             </div>
-            <hr class="text-muted">
+            <hr class="text-white">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="text-muted mb-0">© {{ date('Y') }} Retrina Framework. Built with ❤️ and PHP.</p>
+                    <p class="text-white mb-0">© {{ date('Y') }} Retrina Framework. Built with ❤️ and PHP.</p>
                 </div>
             </div>
         </div>
