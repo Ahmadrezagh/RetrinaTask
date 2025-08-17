@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\BaseModel;
+
 class User extends BaseModel
 {
     protected $table = 'users';
+    
     protected $fillable = [
         'username',
         'email', 
@@ -26,25 +29,27 @@ class User extends BaseModel
     protected $casts = [
         'is_active' => 'boolean',
         'email_verified_at' => 'datetime',
-        'last_login_at' => 'datetime'
+        'last_login_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
-    
+
     /**
-     * Hash password before saving
+     * Hash password when setting
      */
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = password_hash($value, PASSWORD_DEFAULT);
     }
-    
+
     /**
-     * Get full name
+     * Get user's full name
      */
     public function getFullNameAttribute()
     {
-        return trim($this->first_name . ' ' . $this->last_name);
+        return $this->first_name . ' ' . $this->last_name;
     }
-    
+
     /**
      * Check if user is active
      */
@@ -52,15 +57,15 @@ class User extends BaseModel
     {
         return $this->is_active === true;
     }
-    
+
     /**
      * Check if email is verified
      */
     public function isEmailVerified()
     {
-        return $this->email_verified_at !== null;
+        return !is_null($this->email_verified_at);
     }
-    
+
     /**
      * Verify password
      */
@@ -68,7 +73,7 @@ class User extends BaseModel
     {
         return password_verify($password, $this->password);
     }
-    
+
     /**
      * Update last login timestamp
      */
@@ -77,36 +82,38 @@ class User extends BaseModel
         $this->last_login_at = date('Y-m-d H:i:s');
         return $this->save();
     }
+
+    // Static query methods
     
     /**
-     * Get user by email
+     * Find user by email
      */
     public static function findByEmail($email)
     {
         return static::where('email', $email)->first();
     }
-    
+
     /**
-     * Get user by username
+     * Find user by username
      */
     public static function findByUsername($username)
     {
         return static::where('username', $username)->first();
     }
-    
+
     /**
-     * Get active users
+     * Get only active users
      */
     public static function active()
     {
         return static::where('is_active', true);
     }
-    
+
     /**
-     * Get verified users
+     * Get only verified users
      */
     public static function verified()
     {
         return static::whereNotNull('email_verified_at');
     }
-} 
+}

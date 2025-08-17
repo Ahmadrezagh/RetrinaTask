@@ -22,8 +22,13 @@ class MigrationRunner
         
         foreach ($files as $file) {
             require_once $file;
-            $className = basename($file, '.php');
-            $this->migrations[] = $className;
+            
+            // Extract the actual class name from the file content
+            $content = file_get_contents($file);
+            if (preg_match('/class\s+(\w+)\s+extends/', $content, $matches)) {
+                $className = $matches[1];
+                $this->migrations[] = $className;
+            }
         }
         
         // Sort migrations alphabetically for consistent order

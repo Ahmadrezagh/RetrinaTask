@@ -5,26 +5,46 @@ namespace App\Models;
 use PDO;
 use PDOException;
 
-class BaseModel
+abstract class BaseModel
 {
-    protected $db;
     protected $table;
+    protected $fillable = [];
+    protected $hidden = [];
+    protected $casts = [];
+    protected $attributes = [];
     
-    public function __construct()
+    protected static $db;
+    
+    public function __construct(array $attributes = [])
     {
-        $this->db = $this->getConnection();
+        $this->attributes = $attributes;
+        static::$db = static::getConnection();
     }
     
     /**
      * Get database connection
      */
-    private function getConnection()
+    protected static function getConnection()
     {
+        if (static::$db) {
+            return static::$db;
+        }
+        
         $config = require __DIR__ . '/../../config/database.php';
         
         try {
-            $dsn = "mysql:host={$config['host']};dbname={$config['database']};charset={$config['charset']}";
-            $pdo = new PDO($dsn, $config['username'], $config['password'], $config['options']);
+            if ($config['driver'] === 'sqlite') {
+                $dsn = "sqlite:" . $config['database'];
+                $pdo = new PDO($dsn);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } elseif ($config['driver'] === 'mysql') {
+                $dsn = "mysql:host={$config['host']};dbname={$config['database']};charset={$config['charset']}";
+                $pdo = new PDO($dsn, $config['username'], $config['password'], $config['options']);
+            } else {
+                throw new \Exception("Unsupported database driver: " . $config['driver']);
+            }
+            
+            static::$db = $pdo;
             return $pdo;
         } catch (PDOException $e) {
             throw new \Exception("Database connection failed: " . $e->getMessage());
@@ -32,71 +52,125 @@ class BaseModel
     }
     
     /**
-     * Find all records
+     * Get all records
      */
-    public function findAll()
+    public static function all()
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table}");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $instance = new static();
+        $stmt = static::getConnection()->query("SELECT * FROM " . $instance->table);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return array_map(function($row) {
+            return new static($row);
+        }, $results);
     }
     
     /**
      * Find record by ID
      */
-    public function findById($id)
+    public static function find($id)
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = :id");
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $instance = new static();
+        $stmt = static::getConnection()->prepare("SELECT * FROM " . $instance->table . " WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $result ? new static($result) : null;
     }
     
     /**
      * Create new record
      */
-    public function create($data)
+    public static function create(array $data)
     {
-        $columns = implode(',', array_keys($data));
-        $placeholders = ':' . implode(', :', array_keys($data));
+        $instance = new static();
         
-        $stmt = $this->db->prepare("INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})");
+        // Filter fillable fields
+        $filtered = array_intersect_key($data, array_flip($instance->fillable));
         
-        foreach ($data as $key => $value) {
-            $stmt->bindValue(":{$key}", $value);
+        // Add timestamps
+        $now = date('Y-m-d H:i:s');
+        $filtered['created_at'] = $now;
+        $filtered['updated_at'] = $now;
+        
+        $columns = implode(',', array_keys($filtered));
+        $placeholders = ':' . implode(', :', array_keys($filtered));
+        
+        $sql = "INSERT INTO " . $instance->table . " ($columns) VALUES ($placeholders)";
+        $stmt = static::getConnection()->prepare($sql);
+        
+        // Handle password hashing
+        if (isset($filtered['password'])) {
+            $filtered['password'] = password_hash($filtered['password'], PASSWORD_DEFAULT);
         }
         
-        return $stmt->execute();
+        $stmt->execute($filtered);
+        
+        // Get the created record
+        $id = static::getConnection()->lastInsertId();
+        return static::find($id);
     }
     
     /**
-     * Update record by ID
+     * Simple where clause
      */
-    public function update($id, $data)
+    public static function where($column, $value)
     {
-        $setClause = '';
-        foreach ($data as $key => $value) {
-            $setClause .= "{$key} = :{$key}, ";
-        }
-        $setClause = rtrim($setClause, ', ');
-        
-        $stmt = $this->db->prepare("UPDATE {$this->table} SET {$setClause} WHERE id = :id");
-        $stmt->bindParam(':id', $id);
-        
-        foreach ($data as $key => $value) {
-            $stmt->bindValue(":{$key}", $value);
-        }
-        
-        return $stmt->execute();
+        return new static(['where' => [$column, $value]]);
     }
     
     /**
-     * Delete record by ID
+     * Get query results  
      */
-    public function delete($id)
+    public function get()
     {
-        $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
+        $sql = "SELECT * FROM " . $this->table;
+        $params = [];
+        
+        if (isset($this->attributes['where'])) {
+            $sql .= " WHERE " . $this->attributes['where'][0] . " = ?";
+            $params[] = $this->attributes['where'][1];
+        }
+        
+        $stmt = static::getConnection()->prepare($sql);
+        $stmt->execute($params);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return array_map(function($row) {
+            return new static($row);
+        }, $results);
+    }
+    
+    /**
+     * Get first result
+     */
+    public function first()
+    {
+        $results = $this->get();
+        return count($results) > 0 ? $results[0] : null;
+    }
+    
+    /**
+     * Get attribute value
+     */
+    public function __get($key)
+    {
+        return $this->attributes[$key] ?? null;
+    }
+    
+    /**
+     * Set attribute value
+     */
+    public function __set($key, $value)
+    {
+        $this->attributes[$key] = $value;
+    }
+    
+    /**
+     * Check if attribute exists
+     */
+    public function __isset($key)
+    {
+        return isset($this->attributes[$key]);
     }
 } 

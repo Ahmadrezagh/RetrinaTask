@@ -130,12 +130,8 @@ abstract class Migration
      */
     protected function markAsRun()
     {
-        $this->ensureMigrationsTable();
-        
-        $stmt = $this->db->prepare("
-            INSERT INTO migrations (migration, executed_at) 
-            VALUES (?, NOW())
-        ");
+        $now = $this->now();
+        $stmt = $this->db->prepare("INSERT INTO migrations (migration, executed_at) VALUES (?, {$now})");
         $stmt->execute([$this->migrationName]);
     }
     
