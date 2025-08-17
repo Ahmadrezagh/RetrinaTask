@@ -59,7 +59,9 @@ class ViewEngine
         
         // If view extends a layout, render with layout
         if ($this->extends) {
-            return $this->renderWithLayout($this->extends, $content);
+            // When extending, we don't use the captured content directly
+            // The sections were populated during the view processing
+            return $this->renderWithLayout($this->extends, '');
         }
         
         // If layout is specified, render with layout
@@ -75,8 +77,10 @@ class ViewEngine
      */
     private function renderWithLayout($layout, $content)
     {
-        // Set the main content section
-        $this->sections['content'] = $content;
+        // Set the main content section only if not already set (for non-extending views)
+        if (!isset($this->sections['content']) && !empty($content)) {
+            $this->sections['content'] = $content;
+        }
         
         // Start output buffering for layout
         ob_start();
@@ -248,20 +252,29 @@ class ViewEngine
      */
     private function getLayoutPath($layout)
     {
-        // Check for template file first
-        $templateFile = $this->layoutPath . $layout . '.retrina.php';
+        // Convert dot notation to path (e.g., 'layouts.app' -> 'layouts/app')
+        $layoutPath = str_replace('.', '/', $layout);
+        
+        // Check for template file first (.retrina.php)
+        $templateFile = $this->viewPath . $layoutPath . '.retrina.php';
         if (file_exists($templateFile)) {
             return $templateFile;
         }
         
         // Check for .ret.php extension
-        $retFile = $this->layoutPath . $layout . '.ret.php';
+        $retFile = $this->viewPath . $layoutPath . '.ret.php';
         if (file_exists($retFile)) {
             return $retFile;
         }
         
         // Fallback to regular .php file
-        return $this->layoutPath . $layout . '.php';
+        $phpFile = $this->viewPath . $layoutPath . '.php';
+        if (file_exists($phpFile)) {
+            return $phpFile;
+        }
+        
+        // If no file found, throw an error
+        throw new \Exception("Layout file not found: {$layoutPath} (searched .retrina.php, .ret.php, .php)");
     }
     
     /**

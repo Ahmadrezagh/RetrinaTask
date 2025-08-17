@@ -1,177 +1,150 @@
-@extends('auth')
+@extends('layouts.app')
 
-@section('title')
-Login - Retrina Framework
-@endsection
-
-@section('page-title')
-Welcome Back
-@endsection
-
-@section('page-description')
-Please sign in to your account to continue
-@endsection
+@section('title', 'Login - Retrina Framework')
 
 @section('content')
-<form action="@url('/login')" method="POST" novalidate>
-    @csrf
-    
-    <div class="mb-3">
-        <label for="email" class="form-label">
-            <i class="bi bi-envelope me-1"></i>Email Address
-        </label>
-        <input type="email" class="form-control form-control-lg" id="email" name="email" 
-               placeholder="Enter your email" value="{{ old('email') }}" required>
-        <div class="invalid-feedback">
-            Please provide a valid email address.
-        </div>
-    </div>
-    
-    <div class="mb-3">
-        <label for="password" class="form-label">
-            <i class="bi bi-lock me-1"></i>Password
-        </label>
-        <div class="input-group">
-            <input type="password" class="form-control form-control-lg" id="password" name="password" 
-                   placeholder="Enter your password" required>
-            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
-                <i class="bi bi-eye" id="toggleIcon"></i>
-            </button>
-        </div>
-        <div class="invalid-feedback">
-            Password is required.
-        </div>
-    </div>
-    
-    <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="remember" name="remember">
-        <label class="form-check-label" for="remember">
-            Remember me
-        </label>
-    </div>
-    
-    <button type="submit" class="btn btn-gradient btn-lg w-100 mb-3">
-        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
-    </button>
-    
-    <div class="text-center">
-        <a href="#" class="text-decoration-none">
-            <i class="bi bi-question-circle me-1"></i>Forgot your password?
-        </a>
-    </div>
-</form>
-@endsection
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <i class="bi bi-shield-lock display-4 text-primary"></i>
+                        </div>
+                        <h1 class="h3 mb-1">Welcome Back!</h1>
+                        <p class="text-muted">Sign in to your account</p>
+                    </div>
 
-@section('footer-links')
-<p class="mb-0">
-    Don't have an account? 
-    <a href="#" class="text-decoration-none fw-bold">Sign up here</a>
-</p>
-<hr class="my-2">
-<div class="d-flex justify-content-center gap-3">
-    <a href="#" class="btn btn-outline-primary btn-sm">
-        <i class="bi bi-google"></i>
-    </a>
-    <a href="#" class="btn btn-outline-primary btn-sm">
-        <i class="bi bi-facebook"></i>
-    </a>
-    <a href="#" class="btn btn-outline-primary btn-sm">
-        <i class="bi bi-github"></i>
-    </a>
+                    <!-- Login Form -->
+                    <form method="POST" action="/demo/login" id="loginForm">
+                        @csrf
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       placeholder="Enter your username" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       placeholder="Enter your password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Sign In
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Demo Credentials -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="bi bi-info-circle"></i> Demo Credentials
+                        </h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <small>
+                                    <strong>Admin:</strong><br>
+                                    Username: admin<br>
+                                    Password: admin123
+                                </small>
+                            </div>
+                            <div class="col-6">
+                                <small>
+                                    <strong>User:</strong><br>
+                                    Username: user<br>
+                                    Password: user123
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Fill Buttons -->
+                    <div class="d-flex gap-2 mb-3">
+                        <button type="button" class="btn btn-outline-warning btn-sm flex-fill" onclick="fillAdmin()">
+                            <i class="bi bi-shield-check"></i> Fill Admin
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm flex-fill" onclick="fillUser()">
+                            <i class="bi bi-person"></i> Fill User
+                        </button>
+                    </div>
+
+                    <!-- Register Link -->
+                    <div class="text-center">
+                        <p class="text-muted">
+                            Don't have an account? 
+                            <a href="/register" class="text-decoration-none">
+                                <i class="bi bi-person-plus"></i> Create one here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('scripts')
 <script>
-    function togglePassword() {
-        const passwordInput = document.getElementById('password');
-        const toggleIcon = document.getElementById('toggleIcon');
-        
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleIcon.classList.remove('bi-eye');
-            toggleIcon.classList.add('bi-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            toggleIcon.classList.remove('bi-eye-slash');
-            toggleIcon.classList.add('bi-eye');
-        }
-    }
+// Toggle password visibility
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const password = document.getElementById('password');
+    const icon = this.querySelector('i');
     
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent actual submission for demo
-            
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            
-            // Reset validation classes
-            const inputs = form.querySelectorAll('.form-control');
-            inputs.forEach(input => {
-                input.classList.remove('is-valid', 'is-invalid');
-            });
-            
-            let isValid = true;
-            
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email || !emailRegex.test(email)) {
-                document.getElementById('email').classList.add('is-invalid');
-                isValid = false;
-            } else {
-                document.getElementById('email').classList.add('is-valid');
-            }
-            
-            // Password validation
-            if (!password || password.length < 6) {
-                document.getElementById('password').classList.add('is-invalid');
-                isValid = false;
-            } else {
-                document.getElementById('password').classList.add('is-valid');
-            }
-            
-            if (isValid) {
-                // Show loading state
-                const submitBtn = form.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing In...';
-                submitBtn.disabled = true;
-                
-                // Simulate API call
-                setTimeout(() => {
-                    alert('Demo login successful! (This is just a demo - no actual authentication)');
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }, 2000);
-            }
-        });
-        
-        // Real-time validation
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        
-        emailInput.addEventListener('blur', function() {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (this.value.trim() && emailRegex.test(this.value)) {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
-            } else if (this.value.trim()) {
-                this.classList.remove('is-valid');
-                this.classList.add('is-invalid');
-            }
-        });
-        
-        passwordInput.addEventListener('blur', function() {
-            if (this.value.trim() && this.value.length >= 6) {
-                this.classList.remove('is-invalid');
-                this.classList.add('is-valid');
-            } else if (this.value.trim()) {
-                this.classList.remove('is-valid');
-                this.classList.add('is-invalid');
-            }
-        });
-    });
+    if (password.type === 'password') {
+        password.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        password.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+});
+
+// Quick fill functions
+function fillAdmin() {
+    document.getElementById('username').value = 'admin';
+    document.getElementById('password').value = 'admin123';
+}
+
+function fillUser() {
+    document.getElementById('username').value = 'user';
+    document.getElementById('password').value = 'user123';
+}
+
+// Form validation
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    
+    if (!username || !password) {
+        e.preventDefault();
+        alert('Please fill in all fields');
+        return false;
+    }
+});
 </script>
 @endsection 

@@ -137,20 +137,17 @@ class Application
     }
     
     /**
-     * Load routes from routes files
+     * Load routes from files
      */
     public function loadRoutes()
     {
-        $app = $this;
+        $app = $this; // Make $app available in route files
+        $router = $this->router; // Make $router available in route files
         
-        // Load web routes
         if (file_exists($this->basePath . '/routes/web.php')) {
             require $this->basePath . '/routes/web.php';
         }
-        
-        // Load API routes
         if (file_exists($this->basePath . '/routes/api.php')) {
-            $router = $this->router;
             require $this->basePath . '/routes/api.php';
         }
     }
