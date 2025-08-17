@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?= $this->csrf() ?>">
-    <title><?= $this->yield('title', 'Retrina Framework') ?></title>
+    <meta name="csrf-token" content="@csrf_token">
+    <title>@yield('title', 'Retrina Framework')</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -47,7 +47,7 @@
         }
     </style>
     
-    <?= $this->yield('styles') ?>
+    @yield('styles')
 </head>
 <body>
     <!-- Header -->
@@ -57,11 +57,11 @@
                 <div class="col">
                     <h1 class="navbar-brand mb-0">
                         <i class="bi bi-code-slash me-2"></i>
-                        <?= $this->yield('page-title', 'Retrina Framework') ?>
+                        @yield('page-title', 'Retrina Framework')
                     </h1>
                 </div>
                 <div class="col-auto">
-                    <span class="badge bg-light text-dark">v<?= $app_version ?? '1.0.0' ?></span>
+                    <span class="badge bg-light text-dark">v{{ $app_version ?? '1.0.0' }}</span>
                 </div>
             </div>
         </div>
@@ -76,34 +76,34 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->url('/') ?>">
+                        <a class="nav-link" href="@url('/')">
                             <i class="bi bi-house me-1"></i>Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->url('/about') ?>">
+                        <a class="nav-link" href="@url('/about')">
                             <i class="bi bi-info-circle me-1"></i>About
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->url('/user/123') ?>">
+                        <a class="nav-link" href="@url('/user/123')">
                             <i class="bi bi-person me-1"></i>User Profile
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->url('/api') ?>">
+                        <a class="nav-link" href="@url('/api')">
                             <i class="bi bi-cloud me-1"></i>API
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->url('/hello/World') ?>">
+                        <a class="nav-link" href="@url('/hello/World')">
                             <i class="bi bi-chat-heart me-1"></i>Hello
                         </a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->url('/login') ?>">
+                        <a class="nav-link" href="@url('/login')">
                             <i class="bi bi-box-arrow-in-right me-1"></i>Login
                         </a>
                     </li>
@@ -116,26 +116,26 @@
     <main class="main-content">
         <div class="container my-4">
             <!-- Flash Messages -->
-            <?php if (isset($_SESSION['flash_success'])): ?>
+            @isset($_SESSION['flash_success'])
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="bi bi-check-circle me-2"></i>
-                    <?= $this->escape($_SESSION['flash_success']) ?>
+                    {{ $_SESSION['flash_success'] }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <?php unset($_SESSION['flash_success']); ?>
+                    @php unset($_SESSION['flash_success']); @endphp
                 </div>
-            <?php endif; ?>
-
-            <?php if (isset($_SESSION['flash_error'])): ?>
+            @endisset
+            
+            @isset($_SESSION['flash_error'])
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    <?= $this->escape($_SESSION['flash_error']) ?>
+                    {{ $_SESSION['flash_error'] }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <?php unset($_SESSION['flash_error']); ?>
+                    @php unset($_SESSION['flash_error']); @endphp
                 </div>
-            <?php endif; ?>
+            @endisset
 
             <!-- Page Content -->
-            <?= $this->yield('content') ?>
+            @yield('content')
         </div>
     </main>
 
@@ -146,12 +146,12 @@
                 <div class="col-md-6">
                     <p class="mb-0">
                         <i class="bi bi-heart-fill text-danger me-1"></i>
-                        &copy; <?= date('Y') ?> <?= $app_name ?? 'Retrina Framework' ?>. Built with PHP.
+                        &copy; {{ $year ?? date('Y') }} {{ $app_name ?? 'Retrina Framework' }}. Built with PHP.
                     </p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <small class="text-muted">
-                        <?= $this->yield('footer', 'Powered by Bootstrap 5') ?>
+                        Powered by Bootstrap 5
                     </small>
                 </div>
             </div>
@@ -223,6 +223,6 @@
         }
     </script>
 
-    <?= $this->yield('scripts') ?>
+    @yield('scripts')
 </body>
 </html> 

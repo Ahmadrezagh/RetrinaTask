@@ -20,23 +20,27 @@ class TemplateCompiler
      */
     private function initializePatterns()
     {
-        // Basic output patterns
-        $this->patterns[] = '/\{\{\s*(.+?)\s*\}\}/';
-        $this->replacements[] = '<?php echo $1; ?>';
+        // Comments (must be first to avoid conflicts)
+        $this->patterns[] = '/\{\{--(.+?)--\}\}/s';
+        $this->replacements[] = '<?php /* $1 */ ?>';
         
-        // Raw output (unescaped)
-        $this->patterns[] = '/\{\!\!\s*(.+?)\s*\!\!\}/';
-        $this->replacements[] = '<?php echo $1; ?>';
-        
-        // Escaped output (default for security)
+        // Raw output (unescaped) - triple braces, must come before double braces
         $this->patterns[] = '/\{\{\{\s*(.+?)\s*\}\}\}/';
         $this->replacements[] = '<?php echo $this->escape($1); ?>';
         
+        // Raw output (unescaped) - {!! !!} syntax for unescaped HTML
+        $this->patterns[] = '/\{\!\!\s*(.+?)\s*\!\!\}/';
+        $this->replacements[] = '<?php echo $1; ?>';
+        
+        // Basic output patterns - double braces (must come after triple braces)
+        $this->patterns[] = '/\{\{\s*(.+?)\s*\}\}/';
+        $this->replacements[] = '<?php echo $1; ?>';
+        
         // Control structures
-        $this->patterns[] = '/\@if\s*\((.+?)\)/';
+        $this->patterns[] = '/\@if\s*\((.+?)\)/s';
         $this->replacements[] = '<?php if($1): ?>';
         
-        $this->patterns[] = '/\@elseif\s*\((.+?)\)/';
+        $this->patterns[] = '/\@elseif\s*\((.+?)\)/s';
         $this->replacements[] = '<?php elseif($1): ?>';
         
         $this->patterns[] = '/\@else/';
@@ -46,19 +50,19 @@ class TemplateCompiler
         $this->replacements[] = '<?php endif; ?>';
         
         // Loops
-        $this->patterns[] = '/\@foreach\s*\((.+?)\)/';
+        $this->patterns[] = '/\@foreach\s*\((.+?)\)/s';
         $this->replacements[] = '<?php foreach($1): ?>';
         
         $this->patterns[] = '/\@endforeach/';
         $this->replacements[] = '<?php endforeach; ?>';
         
-        $this->patterns[] = '/\@for\s*\((.+?)\)/';
+        $this->patterns[] = '/\@for\s*\((.+?)\)/s';
         $this->replacements[] = '<?php for($1): ?>';
         
         $this->patterns[] = '/\@endfor/';
         $this->replacements[] = '<?php endfor; ?>';
         
-        $this->patterns[] = '/\@while\s*\((.+?)\)/';
+        $this->patterns[] = '/\@while\s*\((.+?)\)/s';
         $this->replacements[] = '<?php while($1): ?>';
         
         $this->patterns[] = '/\@endwhile/';
@@ -74,21 +78,26 @@ class TemplateCompiler
         $this->patterns[] = '/\@endsection/';
         $this->replacements[] = '<?php $this->endSection(); ?>';
         
-        $this->patterns[] = '/\@yield\s*\(\s*[\'"](.+?)[\'"]\s*(?:,\s*[\'"](.+?)[\'"]\s*)?\)/';
-        $this->replacements[] = '<?php echo $this->yield(\'$1\'$2 ? \', \'$2\'\' : \'\'); ?>';
+        // Yield with default value
+        $this->patterns[] = '/\@yield\s*\(\s*[\'"](.+?)[\'"]\s*,\s*[\'"](.+?)[\'"]\s*\)/';
+        $this->replacements[] = '<?php echo $this->yield(\'$1\', \'$2\'); ?>';
+        
+        // Yield without default value
+        $this->patterns[] = '/\@yield\s*\(\s*[\'"](.+?)[\'"]\s*\)/';
+        $this->replacements[] = '<?php echo $this->yield(\'$1\'); ?>';
         
         // Includes
-        $this->patterns[] = '/\@include\s*\(\s*[\'"](.+?)[\'"]\s*(?:,\s*(.+?))?\)/';
+        $this->patterns[] = '/\@include\s*\(\s*[\'"](.+?)[\'"]\s*(?:,\s*(.+?))?\)/s';
         $this->replacements[] = '<?php $this->include(\'$1\'$2 ? \', $2\' : \'\'); ?>';
         
         // Isset and empty checks
-        $this->patterns[] = '/\@isset\s*\((.+?)\)/';
+        $this->patterns[] = '/\@isset\s*\((.+?)\)/s';
         $this->replacements[] = '<?php if(isset($1)): ?>';
         
         $this->patterns[] = '/\@endisset/';
         $this->replacements[] = '<?php endif; ?>';
         
-        $this->patterns[] = '/\@empty\s*\((.+?)\)/';
+        $this->patterns[] = '/\@empty\s*\((.+?)\)/s';
         $this->replacements[] = '<?php if(empty($1)): ?>';
         
         $this->patterns[] = '/\@endempty/';
@@ -108,6 +117,9 @@ class TemplateCompiler
         $this->replacements[] = '<?php endif; ?>';
         
         // Form helpers
+        $this->patterns[] = '/\@csrf_token/';
+        $this->replacements[] = '<?php echo $this->csrf(); ?>';
+        
         $this->patterns[] = '/\@csrf/';
         $this->replacements[] = '<?php echo $this->csrfField(); ?>';
         
@@ -120,10 +132,6 @@ class TemplateCompiler
         
         $this->patterns[] = '/\@asset\s*\(\s*[\'"](.+?)[\'"]\s*\)/';
         $this->replacements[] = '<?php echo $this->asset(\'$1\'); ?>';
-        
-        // Comments
-        $this->patterns[] = '/\{\{--(.+?)--\}\}/s';
-        $this->replacements[] = '<?php /* $1 */ ?>';
         
         // PHP blocks
         $this->patterns[] = '/\@php/';
@@ -156,11 +164,36 @@ class TemplateCompiler
      */
     public function compile($content)
     {
+        // Protect code blocks from compilation
+        $protectedBlocks = [];
+        $blockIndex = 0;
+        
+        // Protect <code>...</code> blocks
+        $content = preg_replace_callback('/<code[^>]*>.*?<\/code>/s', function($matches) use (&$protectedBlocks, &$blockIndex) {
+            $placeholder = "___PROTECTED_CODE_BLOCK_{$blockIndex}___";
+            $protectedBlocks[$placeholder] = $matches[0];
+            $blockIndex++;
+            return $placeholder;
+        }, $content);
+        
+        // Protect <pre><code>...</code></pre> blocks
+        $content = preg_replace_callback('/<pre[^>]*><code[^>]*>.*?<\/code><\/pre>/s', function($matches) use (&$protectedBlocks, &$blockIndex) {
+            $placeholder = "___PROTECTED_PRE_CODE_BLOCK_{$blockIndex}___";
+            $protectedBlocks[$placeholder] = $matches[0];
+            $blockIndex++;
+            return $placeholder;
+        }, $content);
+        
         // Apply all patterns
         $compiled = preg_replace($this->patterns, $this->replacements, $content);
         
         // Clean up any remaining whitespace around PHP tags
         $compiled = preg_replace('/\?>\s+<\?php/', '', $compiled);
+        
+        // Restore protected blocks
+        foreach ($protectedBlocks as $placeholder => $originalContent) {
+            $compiled = str_replace($placeholder, $originalContent, $compiled);
+        }
         
         return $compiled;
     }

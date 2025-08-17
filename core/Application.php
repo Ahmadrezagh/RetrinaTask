@@ -10,12 +10,14 @@ class Application
     public function __construct($basePath = null)
     {
         $this->basePath = $basePath ?: dirname(__DIR__);
-        $this->router = new Router();
         
         $this->startSession();
         $this->loadHelpers();
         $this->registerAutoloader();
         $this->registerErrorHandler();
+        
+        // Router must be instantiated after autoloader is registered
+        $this->router = new Router();
     }
     
     /**

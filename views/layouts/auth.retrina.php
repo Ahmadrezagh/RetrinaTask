@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="<?= $this->csrf() ?>">
-    <title><?= $this->yield('title', 'Authentication - Retrina Framework') ?></title>
+    <meta name="csrf-token" content="@csrf_token">
+    <title>@yield('title', 'Authentication - Retrina Framework')</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -101,12 +101,12 @@
         }
     </style>
     
-    <?= $this->yield('styles') ?>
+    @yield('styles')
 </head>
 <body class="auth-bg">
     <div class="floating-shapes"></div>
     
-    <a href="<?= $this->url('/') ?>" class="back-link btn btn-light btn-sm rounded-pill">
+    <a href="@url('/')" class="back-link btn btn-light btn-sm rounded-pill">
         <i class="bi bi-arrow-left me-1"></i>Back to Home
     </a>
     
@@ -121,38 +121,38 @@
                                 <i class="bi bi-shield-lock"></i>
                             </div>
                             <h2 class="card-title mb-2">
-                                <?= $this->yield('page-title', 'Authentication') ?>
+                                @yield('page-title', 'Authentication')
                             </h2>
                             <p class="text-muted">
-                                <?= $this->yield('page-description', 'Please sign in to continue') ?>
+                                @yield('page-description', 'Please sign in to continue')
                             </p>
                         </div>
 
                         <!-- Flash Messages -->
-                        <?php if (isset($_SESSION['flash_error'])): ?>
+                        @isset($_SESSION['flash_error'])
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <small><?= $this->escape($_SESSION['flash_error']) ?></small>
+                                <small>{{ $_SESSION['flash_error'] }}</small>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                <?php unset($_SESSION['flash_error']); ?>
+                                @php unset($_SESSION['flash_error']); @endphp
                             </div>
-                        <?php endif; ?>
+                        @endisset
 
-                        <?php if (isset($_SESSION['flash_success'])): ?>
+                        @isset($_SESSION['flash_success'])
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 <i class="bi bi-check-circle me-2"></i>
-                                <small><?= $this->escape($_SESSION['flash_success']) ?></small>
+                                <small>{{ $_SESSION['flash_success'] }}</small>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                <?php unset($_SESSION['flash_success']); ?>
+                                @php unset($_SESSION['flash_success']); @endphp
                             </div>
-                        <?php endif; ?>
+                        @endisset
 
                         <!-- Content -->
-                        <?= $this->yield('content') ?>
+                        @yield('content')
 
                         <!-- Footer Links -->
                         <div class="text-center mt-4 pt-3 border-top">
-                            <?= $this->yield('footer-links') ?>
+                            @yield('footer-links')
                         </div>
                     </div>
                 </div>
@@ -210,6 +210,6 @@
         });
     </script>
 
-    <?= $this->yield('scripts') ?>
+    @yield('scripts')
 </body>
 </html> 

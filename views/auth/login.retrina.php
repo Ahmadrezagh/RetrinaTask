@@ -1,27 +1,27 @@
-<?php $this->extends('auth'); ?>
+@extends('auth')
 
-<?php $this->section('title'); ?>
+@section('title')
 Login - Retrina Framework
-<?php $this->endSection(); ?>
+@endsection
 
-<?php $this->section('page-title'); ?>
+@section('page-title')
 Welcome Back
-<?php $this->endSection(); ?>
+@endsection
 
-<?php $this->section('page-description'); ?>
+@section('page-description')
 Please sign in to your account to continue
-<?php $this->endSection(); ?>
+@endsection
 
-<?php $this->section('content'); ?>
-<form action="<?= $this->url('/login') ?>" method="POST" novalidate>
-    <?= $this->csrfField() ?>
+@section('content')
+<form action="@url('/login')" method="POST" novalidate>
+    @csrf
     
     <div class="mb-3">
         <label for="email" class="form-label">
             <i class="bi bi-envelope me-1"></i>Email Address
         </label>
         <input type="email" class="form-control form-control-lg" id="email" name="email" 
-               placeholder="Enter your email" value="<?= $this->old('email') ?>" required>
+               placeholder="Enter your email" value="{{ old('email') }}" required>
         <div class="invalid-feedback">
             Please provide a valid email address.
         </div>
@@ -60,9 +60,9 @@ Please sign in to your account to continue
         </a>
     </div>
 </form>
-<?php $this->endSection(); ?>
+@endsection
 
-<?php $this->section('footer-links'); ?>
+@section('footer-links')
 <p class="mb-0">
     Don't have an account? 
     <a href="#" class="text-decoration-none fw-bold">Sign up here</a>
@@ -79,9 +79,9 @@ Please sign in to your account to continue
         <i class="bi bi-github"></i>
     </a>
 </div>
-<?php $this->endSection(); ?>
+@endsection
 
-<?php $this->section('scripts'); ?>
+@section('scripts')
 <script>
     function togglePassword() {
         const passwordInput = document.getElementById('password');
@@ -174,4 +174,4 @@ Please sign in to your account to continue
         });
     });
 </script>
-<?php $this->endSection(); ?> 
+@endsection 

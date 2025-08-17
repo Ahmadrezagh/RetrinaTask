@@ -1,16 +1,16 @@
-<?php $this->extends('app'); ?>
+@extends('app')
 
-<?php $this->section('title'); ?>
-User Profile - <?= $this->escape($user_id ?? 'Unknown') ?> - Retrina Framework
-<?php $this->endSection(); ?>
+@section('title')
+User Profile - {{{ $user_id ?? 'Unknown' }}} - Retrina Framework
+@endsection
 
-<?php $this->section('page-title'); ?>
+@section('page-title')
 User Profile
-<?php $this->endSection(); ?>
+@endsection
 
-<?php $this->section('content'); ?>
+@section('content')
 <div class="profile-section">
-    <!-- Profile Header -->
+    {{-- Profile Header --}}
     <div class="card border-0 shadow-sm mb-4 overflow-hidden">
         <div class="gradient-bg text-white p-4">
             <div class="row align-items-center">
@@ -20,14 +20,14 @@ User Profile
                     </div>
                 </div>
                 <div class="col">
-                    <h2 class="mb-1">User #<?= $this->escape($user_id ?? 'N/A') ?></h2>
+                    <h2 class="mb-1">User #{{{ $user_id ?? 'N/A' }}}</h2>
                     <p class="mb-0 opacity-75">
                         <i class="bi bi-calendar-check me-1"></i>
                         Profile information and details
                     </p>
                     <small class="opacity-50">
                         <i class="bi bi-clock me-1"></i>
-                        Last updated: <?= date('M d, Y') ?>
+                        Last updated: {{ date('M d, Y') }}
                     </small>
                 </div>
                 <div class="col-auto">
@@ -40,7 +40,7 @@ User Profile
     </div>
 
     <div class="row g-4">
-        <!-- Profile Information -->
+        {{-- Profile Information --}}
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-light border-0">
@@ -54,13 +54,13 @@ User Profile
                         <div class="col-12">
                             <div class="bg-light rounded p-3">
                                 <small class="text-muted d-block">User ID</small>
-                                <strong class="text-dark"><?= $this->escape($user_id ?? 'Not provided') ?></strong>
+                                <strong class="text-dark">{{{ $user_id ?? 'Not provided' }}}</strong>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="bg-light rounded p-3">
                                 <small class="text-muted d-block">Route Parameter</small>
-                                <strong class="text-dark"><?= $this->escape($route_param ?? 'Successfully captured from URL') ?></strong>
+                                <strong class="text-dark">{{{ $route_param ?? 'Successfully captured from URL' }}}</strong>
                                 <i class="bi bi-check-circle-fill text-success ms-2"></i>
                             </div>
                         </div>
@@ -83,7 +83,7 @@ User Profile
             </div>
         </div>
 
-        <!-- Quick Actions -->
+        {{-- Quick Actions --}}
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-light border-0">
@@ -108,15 +108,16 @@ User Profile
                         </button>
                     </div>
                     
-                    <!-- Demo Form -->
+                    {{-- Demo Form --}}
                     <div class="card bg-light border-0">
                         <div class="card-body">
                             <h6 class="card-title">
                                 <i class="bi bi-shield-lock me-2"></i>
                                 Demo Form with CSRF Protection
                             </h6>
-                            <form action="<?= $this->url('/user/' . ($user_id ?? '1') . '/update') ?>" method="POST">
-                                <?= $this->csrfField() ?>
+                            @php $updateUrl = url('/user/' . ($user_id ?? '1') . '/update'); @endphp
+                            <form action="{{ $updateUrl }}" method="POST">
+                                @csrf
                                 
                                 <div class="mb-3">
                                     <label for="name" class="form-label">
@@ -124,7 +125,7 @@ User Profile
                                     </label>
                                     <input type="text" id="name" name="name" class="form-control" 
                                            placeholder="Enter your name" 
-                                           value="<?= $this->old('name', 'Demo User') ?>" required>
+                                           value="{{ old('name', 'Demo User') }}" required>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -133,7 +134,7 @@ User Profile
                                     </label>
                                     <input type="email" id="email" name="email" class="form-control" 
                                            placeholder="Enter your email" 
-                                           value="<?= $this->old('email', 'demo@example.com') ?>" required>
+                                           value="{{ old('email', 'demo@example.com') }}" required>
                                 </div>
                                 
                                 <button type="submit" class="btn btn-primary w-100">
@@ -147,7 +148,7 @@ User Profile
         </div>
     </div>
     
-    <!-- Additional Features -->
+    {{-- Additional Features --}}
     <div class="row g-4 mt-2">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
@@ -201,8 +202,8 @@ User Profile
         </div>
     </div>
     
-    <?php if (isset($data) && !empty($data)): ?>
-    <!-- Debug Information -->
+    @isset($data)
+    {{-- Debug Information --}}
     <div class="row g-4 mt-2">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
@@ -213,16 +214,16 @@ User Profile
                     </h5>
                 </div>
                 <div class="card-body p-0">
-                    <pre class="mb-0 p-3 bg-dark text-light overflow-auto" style="max-height: 300px;"><code><?= $this->escape(print_r($data, true)) ?></code></pre>
+                    <pre class="mb-0 p-3 bg-dark text-light overflow-auto" style="max-height: 300px;"><code>{{{ print_r($data, true) }}}</code></pre>
                 </div>
             </div>
         </div>
     </div>
-    <?php endif; ?>
+    @endisset
 </div>
-<?php $this->endSection(); ?>
+@endsection
 
-<?php $this->section('styles'); ?>
+@section('styles')
 <style>
     .profile-section {
         animation: fadeIn 0.5s ease-in;
@@ -266,9 +267,9 @@ User Profile
         }
     }
 </style>
-<?php $this->endSection(); ?>
+@endsection
 
-<?php $this->section('scripts'); ?>
+@section('scripts')
 <script>
     function editProfile() {
         showToast('Edit Profile functionality would be implemented here!', 'info');
@@ -360,4 +361,4 @@ User Profile
         });
     });
 </script>
-<?php $this->endSection(); ?> 
+@endsection 
