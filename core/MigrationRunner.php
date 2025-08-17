@@ -14,71 +14,61 @@ class MigrationRunner
     }
     
     /**
-     * Load all migration files
+     * Load migration files and classes
      */
     private function loadMigrations()
     {
-        $files = glob($this->migrationPath . '*.php');
+        // Load required classes first
+        require_once __DIR__ . '/Migration.php';
+        require_once __DIR__ . '/Database/Connection.php';
+        require_once __DIR__ . '/Database/Schema/Blueprint.php';
+        require_once __DIR__ . '/Database/Schema/Builder.php';
+        require_once __DIR__ . '/Database/Schema/Schema.php';
         
+        $files = glob($this->migrationPath . '*.php');
         foreach ($files as $file) {
             require_once $file;
-            
-            // Extract the actual class name from the file content
             $content = file_get_contents($file);
             if (preg_match('/class\s+(\w+)\s+extends/', $content, $matches)) {
                 $className = $matches[1];
                 $this->migrations[] = $className;
             }
         }
-        
-        // Sort migrations alphabetically for consistent order
         sort($this->migrations);
     }
     
     /**
-     * Run all pending migrations
+     * Run pending migrations
      */
     public function migrate()
     {
-        echo "🚀 Starting database migrations...\n\n";
-        
-        $executed = 0;
-        $skipped = 0;
-        
         foreach ($this->migrations as $migrationClass) {
             try {
                 $migration = new $migrationClass();
                 
-                if ($migration->run()) {
-                    $executed++;
+                if (!$migration->hasBeenRun()) {
+                    $migration->runUp();
                 } else {
-                    $skipped++;
+                    echo "Migration {$migrationClass} has already been run.\n";
                 }
-                
             } catch (\Exception $e) {
-                echo "❌ Failed to run migration {$migrationClass}: " . $e->getMessage() . "\n";
-                return false;
+                echo "❌ Error running migration {$migrationClass}: " . $e->getMessage() . "\n";
+                throw $e;
             }
         }
         
-        echo "\n🎉 Migration completed!\n";
-        echo "   ✅ Executed: {$executed}\n";
-        echo "   ⏭️  Skipped: {$skipped}\n";
-        
-        return true;
+        echo "✅ All migrations completed successfully!\n";
     }
     
     /**
-     * Rollback the last migration
+     * Rollback migrations
      */
     public function rollback($steps = 1)
     {
-        echo "🔄 Rolling back migrations...\n\n";
-        
+        $migrations = array_reverse($this->migrations);
         $rolledBack = 0;
-        $reversedMigrations = array_reverse($this->migrations);
         
-        foreach ($reversedMigrations as $migrationClass) {
+        foreach ($migrations as $migrationClass) {
             if ($rolledBack >= $steps) {
                 break;
             }
@@ -86,20 +76,19 @@ class MigrationRunner
             try {
                 $migration = new $migrationClass();
                 
-                if ($migration->rollback()) {
+                if ($migration->hasBeenRun()) {
+                    $migration->runDown();
                     $rolledBack++;
+                } else {
+                    echo "Migration {$migrationClass} has not been run.\n";
                 }
-                
             } catch (\Exception $e) {
-                echo "❌ Failed to rollback migration {$migrationClass}: " . $e->getMessage() . "\n";
-                return false;
+                echo "❌ Error rolling back migration {$migrationClass}: " . $e->getMessage() . "\n";
+                throw $e;
             }
         }
         
-        echo "\n🎉 Rollback completed!\n";
-        echo "   🔄 Rolled back: {$rolledBack} migrations\n";
-        
-        return true;
+        echo "✅ Rolled back {$rolledBack} migration(s) successfully!\n";
     }
     
     /**
