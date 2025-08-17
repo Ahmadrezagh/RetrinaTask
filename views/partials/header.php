@@ -1,10 +1,18 @@
-<div class="component-header" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid #667eea;">
-    <h3 style="margin: 0; color: #333; font-size: 1.2rem;">
-        <?= $this->escape($title ?? 'Component Header') ?>
-    </h3>
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-header bg-primary text-white border-0">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle me-2"></i>
+            <h5 class="card-title mb-0">
+                <?= $this->escape($title ?? 'Component Header') ?>
+            </h5>
+        </div>
+    </div>
     <?php if (isset($subtitle)): ?>
-        <p style="margin: 0.5rem 0 0 0; color: #666; font-size: 0.9rem;">
+    <div class="card-body py-2">
+        <small class="text-muted">
+            <i class="bi bi-arrow-right me-1"></i>
             <?= $this->escape($subtitle) ?>
-        </p>
+        </small>
+    </div>
     <?php endif; ?>
 </div> 
