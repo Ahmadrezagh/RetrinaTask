@@ -16,8 +16,25 @@
                         <p class="text-muted">Sign in to your account</p>
                     </div>
 
+                    <!-- Flash Messages -->
+                    @if(isset($_SESSION['flash_error']))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {!! $_SESSION['flash_error'] !!}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @php unset($_SESSION['flash_error']); @endphp
+                    @endif
+
+                    @if(isset($_SESSION['flash_success']))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {!! $_SESSION['flash_success'] !!}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @php unset($_SESSION['flash_success']); @endphp
+                    @endif
+
                     <!-- Login Form -->
-                    <form method="POST" action="/demo/login" id="loginForm">
+                    <form method="POST" action="/login" id="loginForm">
                         @csrf
                         
                         <div class="mb-3">

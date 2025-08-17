@@ -9,7 +9,7 @@ namespace Core\Middleware;
  */
 class GuestMiddleware implements MiddlewareInterface
 {
-    public function handle(array $request, callable $next)
+    public function handle($request, $next)
     {
         // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {
@@ -28,39 +28,38 @@ class GuestMiddleware implements MiddlewareInterface
     /**
      * Check if user is authenticated
      */
-    protected function isAuthenticated(): bool
+    protected function isAuthenticated()
     {
         return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
     }
     
     /**
-     * Redirect authenticated users away from guest-only routes
+     * Redirect authenticated user
      */
-    protected function redirectAuthenticated(array $request)
+    protected function redirectAuthenticated($request)
     {
+        // Check if this is an API request
         if ($this->isApiRequest($request)) {
-            http_response_code(403);
+            // Return JSON response for API requests
             header('Content-Type: application/json');
+            http_response_code(403);
             echo json_encode([
-                'status' => 'error',
+                'error' => 'Access denied',
                 'message' => 'Already authenticated',
                 'code' => 403
             ]);
             exit;
         }
         
-        // Redirect to dashboard or home page
-        $redirectUrl = $_SESSION['intended_url'] ?? '/dashboard';
-        unset($_SESSION['intended_url']);
-        
-        header("Location: {$redirectUrl}");
+        // Redirect to dashboard for web requests
+        header('Location: /dashboard');
         exit;
     }
     
     /**
      * Check if request is for API endpoint
      */
-    protected function isApiRequest(array $request): bool
+    protected function isApiRequest($request)
     {
         $uri = $request['uri'] ?? $_SERVER['REQUEST_URI'] ?? '';
         return strpos($uri, '/api/') === 0 || 

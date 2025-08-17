@@ -46,7 +46,6 @@ $router->group(['middleware' => ['api']], function($router) {
         
         // Simple demo authentication
         if ($username === 'admin' && $password === 'admin123') {
-            session_start();
             $_SESSION['user_id'] = 1;
             $_SESSION['user_role'] = 'admin';
             $_SESSION['username'] = 'admin';
@@ -152,7 +151,6 @@ $router->group(['middleware' => ['api', 'auth']], function($router) {
     
     // Logout endpoint
     $router->post('/api/auth/logout', function() {
-        session_start();
         session_destroy();
         
         header('Content-Type: application/json');
@@ -164,7 +162,6 @@ $router->group(['middleware' => ['api', 'auth']], function($router) {
     
     // User profile endpoint
     $router->get('/api/auth/user', function() {
-        session_start();
         
         header('Content-Type: application/json');
         echo json_encode([

@@ -31,6 +31,16 @@ abstract class Model
     }
     
     /**
+     * Create a new model instance from database result
+     */
+    public static function newFromBuilder(array $attributes = [])
+    {
+        $instance = new static($attributes);
+        $instance->exists = true;
+        return $instance;
+    }
+    
+    /**
      * Get database connection
      */
     public static function getConnection()
@@ -421,7 +431,11 @@ abstract class Model
      */
     public static function where($column, $operator = null, $value = null)
     {
-        return static::query()->where($column, $operator, $value);
+        if (func_num_args() === 2) {
+            return static::query()->where($column, $operator);
+        } else {
+            return static::query()->where($column, $operator, $value);
+        }
     }
     
     /**

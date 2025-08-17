@@ -80,7 +80,7 @@ class LogMiddleware implements MiddlewareInterface
     /**
      * Get log file path
      */
-    protected function getLogFile(): string
+    protected function getLogFile()
     {
         $date = date('Y-m-d');
         return __DIR__ . '/../../storage/logs/requests-' . $date . '.log';

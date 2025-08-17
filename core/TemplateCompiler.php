@@ -36,11 +36,11 @@ class TemplateCompiler
         $this->patterns[] = '/\{\{\s*(.+?)\s*\}\}/';
         $this->replacements[] = '<?php echo $1; ?>';
         
-        // Control structures
-        $this->patterns[] = '/\@if\s*\((.+?)\)/s';
+        // Control structures - using balanced parentheses regex
+        $this->patterns[] = '/\@if\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/s';
         $this->replacements[] = '<?php if($1): ?>';
         
-        $this->patterns[] = '/\@elseif\s*\((.+?)\)/s';
+        $this->patterns[] = '/\@elseif\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/s';
         $this->replacements[] = '<?php elseif($1): ?>';
         
         $this->patterns[] = '/\@else/';
@@ -49,20 +49,20 @@ class TemplateCompiler
         $this->patterns[] = '/\@endif/';
         $this->replacements[] = '<?php endif; ?>';
         
-        // Loops
-        $this->patterns[] = '/\@foreach\s*\((.+?)\)/s';
+        // Loops - using balanced parentheses regex
+        $this->patterns[] = '/\@foreach\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/s';
         $this->replacements[] = '<?php foreach($1): ?>';
         
         $this->patterns[] = '/\@endforeach/';
         $this->replacements[] = '<?php endforeach; ?>';
         
-        $this->patterns[] = '/\@for\s*\((.+?)\)/s';
+        $this->patterns[] = '/\@for\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/s';
         $this->replacements[] = '<?php for($1): ?>';
         
         $this->patterns[] = '/\@endfor/';
         $this->replacements[] = '<?php endfor; ?>';
         
-        $this->patterns[] = '/\@while\s*\((.+?)\)/s';
+        $this->patterns[] = '/\@while\s*\(([^()]*(?:\([^()]*\)[^()]*)*)\)/s';
         $this->replacements[] = '<?php while($1): ?>';
         
         $this->patterns[] = '/\@endwhile/';

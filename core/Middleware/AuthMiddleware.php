@@ -28,7 +28,7 @@ class AuthMiddleware implements MiddlewareInterface
     /**
      * Check if user is authenticated
      */
-    protected function isAuthenticated(): bool
+    protected function isAuthenticated()
     {
         return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
     }
@@ -36,7 +36,7 @@ class AuthMiddleware implements MiddlewareInterface
     /**
      * Get authenticated user ID
      */
-    protected function getUserId(): ?int
+    protected function getUserId()
     {
         return $_SESSION['user_id'] ?? null;
     }
@@ -72,7 +72,7 @@ class AuthMiddleware implements MiddlewareInterface
     /**
      * Check if request is for API endpoint
      */
-    protected function isApiRequest(array $request): bool
+    protected function isApiRequest(array $request)
     {
         $uri = $request['uri'] ?? $_SERVER['REQUEST_URI'] ?? '';
         return strpos($uri, '/api/') === 0 || 

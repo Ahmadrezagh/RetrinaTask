@@ -61,6 +61,11 @@ class QueryBuilder
         }
         // 3-argument case: where('column', 'operator', 'value') - already correct
         
+        // Ensure operator is never null or empty (safety check)
+        if (empty($operator)) {
+            $operator = '=';
+        }
+        
         // Convert boolean values to integers for SQLite compatibility
         if (is_bool($value)) {
             $value = $value ? 1 : 0;
@@ -326,7 +331,7 @@ class QueryBuilder
         // If we have a model, hydrate the results
         if ($this->model) {
             return array_map(function($row) {
-                return new $this->model($row);
+                return $this->model::newFromBuilder($row);
             }, $results);
         }
         
@@ -349,7 +354,7 @@ class QueryBuilder
         
         // If we have a model, hydrate the result
         if ($this->model) {
-            return new $this->model($result);
+            return $this->model::newFromBuilder($result);
         }
         
         return $result;
@@ -569,7 +574,8 @@ class QueryBuilder
             
             switch ($where['type']) {
                 case 'basic':
-                    $clause .= $where['column'] . ' ' . $where['operator'] . ' ?';
+                    $operator = $where['operator'] ?? '=';
+                    $clause .= $where['column'] . ' ' . $operator . ' ?';
                     break;
                     
                 case 'in':

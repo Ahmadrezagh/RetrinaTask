@@ -89,7 +89,11 @@ if (!function_exists('csrf_token')) {
      * Generate CSRF token
      */
     function csrf_token() {
-        return Session::getCsrfToken();
+        $token = \Core\Middleware\CsrfMiddleware::getToken();
+        if (!$token) {
+            $token = \Core\Middleware\CsrfMiddleware::generateToken();
+        }
+        return $token;
     }
 }
 

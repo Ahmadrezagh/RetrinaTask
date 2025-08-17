@@ -5,136 +5,168 @@
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+        <div class="col-md-6 col-lg-5">
             <div class="card shadow-lg">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
                         <div class="mb-3">
                             <i class="bi bi-person-plus display-4 text-success"></i>
                         </div>
-                        <h1 class="h3 mb-1">Join Retrina!</h1>
-                        <p class="text-muted">Create your account to get started</p>
+                        <h1 class="h3 mb-1">Create Account</h1>
+                        <p class="text-muted">Join the Retrina Framework community</p>
                     </div>
 
+                    <!-- Flash Messages -->
+                    @if(isset($_SESSION['flash_error']))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {!! $_SESSION['flash_error'] !!}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @php unset($_SESSION['flash_error']); @endphp
+                    @endif
+
+                    @if(isset($_SESSION['flash_success']))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {!! $_SESSION['flash_success'] !!}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    @php unset($_SESSION['flash_success']); @endphp
+                    @endif
+
                     <!-- Registration Form -->
-                    <form method="POST" action="/demo/register" id="registerForm">
+                    <form method="POST" action="/register" id="registerForm" novalidate>
                         @csrf
                         
+                        <!-- Name Fields -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">First Name</label>
+                                <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-person"></i>
                                     </span>
                                     <input type="text" class="form-control" id="first_name" name="first_name" 
-                                           placeholder="First name" required>
+                                           value="{{ $_SESSION['old_input']['first_name'] ?? '' }}"
+                                           placeholder="John" required maxlength="50">
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter your first name.
                                 </div>
                             </div>
+                            
                             <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Last Name</label>
+                                <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-person"></i>
                                     </span>
                                     <input type="text" class="form-control" id="last_name" name="last_name" 
-                                           placeholder="Last name" required>
+                                           value="{{ $_SESSION['old_input']['last_name'] ?? '' }}"
+                                           placeholder="Doe" required maxlength="50">
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter your last name.
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Username -->
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
+                            <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">
                                     <i class="bi bi-at"></i>
                                 </span>
                                 <input type="text" class="form-control" id="username" name="username" 
-                                       placeholder="Choose a username" required>
+                                       value="{{ $_SESSION['old_input']['username'] ?? '' }}"
+                                       placeholder="johndoe" required minlength="3" maxlength="30"
+                                       pattern="[a-zA-Z0-9_-]+" title="Username can only contain letters, numbers, hyphens, and underscores">
                             </div>
-                            <div class="form-text">Must be 3-50 characters long</div>
+                            <div class="form-text">3-30 characters. Letters, numbers, hyphens, and underscores only.</div>
+                            <div class="invalid-feedback">
+                                Please choose a valid username.
+                            </div>
                         </div>
 
+                        <!-- Email -->
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
+                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">
                                     <i class="bi bi-envelope"></i>
                                 </span>
                                 <input type="email" class="form-control" id="email" name="email" 
-                                       placeholder="your@email.com" required>
+                                       value="{{ $_SESSION['old_input']['email'] ?? '' }}"
+                                       placeholder="john@example.com" required maxlength="100">
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a valid email address.
                             </div>
                         </div>
 
+                        <!-- Password -->
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
+                            <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">
                                     <i class="bi bi-lock"></i>
                                 </span>
                                 <input type="password" class="form-control" id="password" name="password" 
-                                       placeholder="Create a strong password" required>
+                                       placeholder="Enter your password" required minlength="6" maxlength="255">
                                 <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
-                            <div class="form-text">At least 8 characters with letters and numbers</div>
+                            <div class="form-text">Minimum 6 characters.</div>
+                            <div class="invalid-feedback">
+                                Password must be at least 6 characters.
+                            </div>
                         </div>
 
+                        <!-- Password Confirmation -->
                         <div class="mb-3">
-                            <label for="password_confirmation" class="form-label">Confirm Password</label>
+                            <label for="password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">
-                                    <i class="bi bi-lock-fill"></i>
+                                    <i class="bi bi-lock"></i>
                                 </span>
-                                <input type="password" class="form-control" id="password_confirmation" 
-                                       name="password_confirmation" placeholder="Confirm your password" required>
+                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" 
+                                       placeholder="Confirm your password" required minlength="6" maxlength="255">
                                 <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirm">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>
+                            <div class="invalid-feedback">
+                                Passwords do not match.
+                            </div>
                         </div>
 
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                        <!-- Terms Checkbox -->
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
                             <label class="form-check-label" for="terms">
-                                I agree to the <a href="/terms" class="text-decoration-none">Terms of Service</a> 
-                                and <a href="/privacy" class="text-decoration-none">Privacy Policy</a>
+                                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> 
+                                and <a href="#" class="text-decoration-none">Privacy Policy</a> 
+                                <span class="text-danger">*</span>
                             </label>
+                            <div class="invalid-feedback">
+                                You must agree to the terms and conditions.
+                            </div>
                         </div>
 
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="newsletter" name="newsletter">
-                            <label class="form-check-label" for="newsletter">
-                                Subscribe to our newsletter for updates and tips
-                            </label>
-                        </div>
-
-                        <div class="d-grid mb-3">
+                        <!-- Submit Button -->
+                        <div class="d-grid">
                             <button type="submit" class="btn btn-success btn-lg">
                                 <i class="bi bi-person-plus"></i> Create Account
                             </button>
                         </div>
                     </form>
 
-                    <!-- Demo Notice -->
-                    <div class="alert alert-warning">
-                        <h6 class="alert-heading">
-                            <i class="bi bi-exclamation-triangle"></i> Demo Mode
-                        </h6>
-                        <small>
-                            This is a demo registration form. In a real application, this would create 
-                            a new user account in the database with proper validation and security measures.
-                        </small>
-                    </div>
-
                     <!-- Login Link -->
-                    <div class="text-center">
-                        <p class="text-muted">
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">
                             Already have an account? 
-                            <a href="/login" class="text-decoration-none">
-                                <i class="bi bi-box-arrow-in-right"></i> Sign in here
-                            </a>
+                            <a href="/login" class="text-decoration-none fw-medium">Sign in here</a>
                         </p>
                     </div>
                 </div>
@@ -142,91 +174,103 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
-// Toggle password visibility
-function togglePasswordField(buttonId, inputId) {
-    document.getElementById(buttonId).addEventListener('click', function() {
-        const password = document.getElementById(inputId);
-        const icon = this.querySelector('i');
-        
-        if (password.type === 'password') {
-            password.type = 'text';
-            icon.className = 'bi bi-eye-slash';
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const password = document.getElementById('password');
+    const passwordConfirm = document.getElementById('password_confirmation');
+    const togglePassword = document.getElementById('togglePassword');
+    const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
+
+    // Password visibility toggles
+    togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('bi-eye');
+        this.querySelector('i').classList.toggle('bi-eye-slash');
+    });
+
+    togglePasswordConfirm.addEventListener('click', function() {
+        const type = passwordConfirm.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordConfirm.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('bi-eye');
+        this.querySelector('i').classList.toggle('bi-eye-slash');
+    });
+
+    // Real-time password confirmation validation
+    passwordConfirm.addEventListener('input', function() {
+        if (password.value !== passwordConfirm.value) {
+            passwordConfirm.setCustomValidity('Passwords do not match');
         } else {
-            password.type = 'password';
-            icon.className = 'bi bi-eye';
+            passwordConfirm.setCustomValidity('');
         }
     });
-}
 
-togglePasswordField('togglePassword', 'password');
-togglePasswordField('togglePasswordConfirm', 'password_confirmation');
+    // Form validation
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
 
-// Form validation
-document.getElementById('registerForm').addEventListener('submit', function(e) {
-    const firstName = document.getElementById('first_name').value.trim();
-    const lastName = document.getElementById('last_name').value.trim();
-    const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const passwordConfirm = document.getElementById('password_confirmation').value;
-    const terms = document.getElementById('terms').checked;
-    
-    let errors = [];
-    
-    // Basic validation
-    if (!firstName || !lastName || !username || !email || !password || !passwordConfirm) {
-        errors.push('Please fill in all required fields');
-    }
-    
     // Username validation
-    if (username.length < 3 || username.length > 50) {
-        errors.push('Username must be 3-50 characters long');
-    }
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        errors.push('Please enter a valid email address');
-    }
-    
-    // Password validation
-    if (password.length < 8) {
-        errors.push('Password must be at least 8 characters long');
-    }
-    
-    // Password confirmation
-    if (password !== passwordConfirm) {
-        errors.push('Passwords do not match');
-    }
-    
-    // Terms acceptance
-    if (!terms) {
-        errors.push('You must agree to the Terms of Service');
-    }
-    
-    if (errors.length > 0) {
-        e.preventDefault();
-        alert('Please fix the following errors:\n\n' + errors.join('\n'));
-        return false;
-    }
-});
-
-// Real-time password confirmation check
-document.getElementById('password_confirmation').addEventListener('input', function() {
-    const password = document.getElementById('password').value;
-    const confirm = this.value;
-    
-    if (confirm && password !== confirm) {
-        this.setCustomValidity('Passwords do not match');
-        this.classList.add('is-invalid');
-    } else {
-        this.setCustomValidity('');
-        this.classList.remove('is-invalid');
-    }
+    document.getElementById('username').addEventListener('input', function() {
+        const username = this.value;
+        const pattern = /^[a-zA-Z0-9_-]+$/;
+        
+        if (username && !pattern.test(username)) {
+            this.setCustomValidity('Username can only contain letters, numbers, hyphens, and underscores');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
 });
 </script>
+
+<style>
+.was-validated .form-control:valid {
+    border-color: #198754;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='m2.3 6.73.94-.94 1.93 1.93 3.53-3.53.94.94L4.16 9.16z'/%3e%3c/svg%3e");
+}
+
+.was-validated .form-control:invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 2.4 2.8m0-2.8L5.8 7.4'/%3e%3c/svg%3e");
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.form-control {
+    border-radius: 8px;
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+}
+
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+}
+
+.input-group .btn {
+    border-radius: 0 8px 8px 0;
+}
+</style>
+
+@php
+// Clear old input after displaying
+if (isset($_SESSION['old_input'])) {
+    unset($_SESSION['old_input']);
+}
+@endphp
 @endsection 

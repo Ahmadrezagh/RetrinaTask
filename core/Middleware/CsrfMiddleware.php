@@ -13,7 +13,7 @@ class CsrfMiddleware implements MiddlewareInterface
         '/api/*', // Exclude API routes by default
     ];
     
-    public function handle(array $request, callable $next)
+    public function handle($request, $next)
     {
         // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {
@@ -41,7 +41,7 @@ class CsrfMiddleware implements MiddlewareInterface
     /**
      * Check if CSRF check should be skipped for this route
      */
-    protected function shouldSkip(array $request): bool
+    protected function shouldSkip($request)
     {
         $uri = $request['uri'] ?? $_SERVER['REQUEST_URI'] ?? '';
         
@@ -57,7 +57,7 @@ class CsrfMiddleware implements MiddlewareInterface
     /**
      * Check if URI matches pattern
      */
-    protected function matchesPattern(string $uri, string $pattern): bool
+    protected function matchesPattern($uri, $pattern)
     {
         // Convert wildcard pattern to regex
         $regex = str_replace(['*', '/'], ['.*', '\/'], $pattern);
@@ -67,10 +67,10 @@ class CsrfMiddleware implements MiddlewareInterface
     /**
      * Verify CSRF token
      */
-    protected function verifyCsrfToken(): bool
+    protected function verifyCsrfToken()
     {
         $token = $this->getTokenFromRequest();
-        $sessionToken = $_SESSION['_token'] ?? null;
+        $sessionToken = $_SESSION['csrf_token'] ?? null;
         
         if (!$token || !$sessionToken) {
             return false;
@@ -82,7 +82,7 @@ class CsrfMiddleware implements MiddlewareInterface
     /**
      * Get CSRF token from request
      */
-    protected function getTokenFromRequest(): ?string
+    protected function getTokenFromRequest()
     {
         // Check POST data
         if (isset($_POST['_token'])) {
@@ -107,20 +107,22 @@ class CsrfMiddleware implements MiddlewareInterface
     /**
      * Handle token mismatch
      */
-    protected function handleTokenMismatch(array $request)
+    protected function handleTokenMismatch($request)
     {
+        // Check if this is an API request
         if ($this->isApiRequest($request)) {
-            http_response_code(419);
+            // Return JSON response for API requests
             header('Content-Type: application/json');
+            http_response_code(419);
             echo json_encode([
-                'status' => 'error',
+                'error' => 'CSRF token mismatch',
                 'message' => 'CSRF token mismatch',
                 'code' => 419
             ]);
             exit;
         }
         
-        // Web request
+        // Return HTML response for web requests
         http_response_code(419);
         echo '<h1>419 Page Expired</h1><p>CSRF token mismatch. Please refresh the page and try again.</p>';
         exit;
@@ -129,7 +131,7 @@ class CsrfMiddleware implements MiddlewareInterface
     /**
      * Check if request is for API endpoint
      */
-    protected function isApiRequest(array $request): bool
+    protected function isApiRequest($request)
     {
         $uri = $request['uri'] ?? $_SERVER['REQUEST_URI'] ?? '';
         return strpos($uri, '/api/') === 0 || 
@@ -139,28 +141,28 @@ class CsrfMiddleware implements MiddlewareInterface
     /**
      * Generate CSRF token
      */
-    public static function generateToken(): string
+    public static function generateToken()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         
-        if (!isset($_SESSION['_token'])) {
-            $_SESSION['_token'] = bin2hex(random_bytes(32));
+        if (!isset($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
         
-        return $_SESSION['_token'];
+        return $_SESSION['csrf_token'];
     }
     
     /**
      * Get current CSRF token
      */
-    public static function getToken(): ?string
+    public static function getToken()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
         
-        return $_SESSION['_token'] ?? null;
+        return $_SESSION['csrf_token'] ?? null;
     }
 } 

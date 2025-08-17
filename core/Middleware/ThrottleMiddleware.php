@@ -41,7 +41,7 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Resolve request signature for rate limiting
      */
-    protected function resolveRequestSignature(array $request): string
+    protected function resolveRequestSignature(array $request)
     {
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $uri = $request['uri'] ?? $_SERVER['REQUEST_URI'] ?? '';
@@ -52,7 +52,7 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Check if too many attempts have been made
      */
-    protected function tooManyAttempts(string $key): bool
+    protected function tooManyAttempts(string $key)
     {
         return $this->attempts($key) >= $this->maxAttempts;
     }
@@ -60,7 +60,7 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Get number of attempts for given key
      */
-    protected function attempts(string $key): int
+    protected function attempts(string $key)
     {
         return (int) $this->getCache($key, 0);
     }
@@ -68,7 +68,7 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Increment attempts counter
      */
-    protected function hit(string $key): void
+    protected function hit(string $key)
     {
         $attempts = $this->attempts($key) + 1;
         $ttl = $this->decayMinutes * 60;
@@ -79,7 +79,7 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Calculate remaining attempts
      */
-    protected function calculateRemainingAttempts(string $key): int
+    protected function calculateRemainingAttempts(string $key)
     {
         return max(0, $this->maxAttempts - $this->attempts($key));
     }
@@ -87,7 +87,7 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Get time until attempts reset
      */
-    protected function getTimeUntilReset(string $key): int
+    protected function getTimeUntilReset(string $key)
     {
         $cacheKey = $this->cachePrefix . $key;
         
@@ -160,7 +160,7 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Set cache value
      */
-    protected function setCache(string $key, $value, int $ttl): void
+    protected function setCache(string $key, $value, int $ttl)
     {
         $cacheKey = $this->cachePrefix . $key;
         $filename = $this->getCacheFilename($cacheKey);
@@ -182,7 +182,7 @@ class ThrottleMiddleware implements MiddlewareInterface
     /**
      * Get cache filename for key
      */
-    protected function getCacheFilename(string $key): string
+    protected function getCacheFilename(string $key)
     {
         $hash = sha1($key);
         return __DIR__ . '/../../storage/cache/throttle/' . substr($hash, 0, 2) . '/' . $hash . '.json';

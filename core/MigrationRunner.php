@@ -26,6 +26,8 @@ class MigrationRunner
         require_once __DIR__ . '/Database/Schema/Schema.php';
         
         $files = glob($this->migrationPath . '*.php');
+        sort($files); // Sort files by filename (which includes timestamp)
+        
         foreach ($files as $file) {
             require_once $file;
             $content = file_get_contents($file);
@@ -34,7 +36,7 @@ class MigrationRunner
                 $this->migrations[] = $className;
             }
         }
-        sort($this->migrations);
+        // Don't sort migrations by class name - keep the file order
     }
     
     /**
@@ -58,6 +60,7 @@ class MigrationRunner
         }
         
         echo "✅ All migrations completed successfully!\n";
+        return true;
     }
     
     /**

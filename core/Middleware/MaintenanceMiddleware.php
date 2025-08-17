@@ -26,7 +26,7 @@ class MaintenanceMiddleware implements MiddlewareInterface
     /**
      * Check if application is in maintenance mode
      */
-    protected function isInMaintenanceMode(): bool
+    protected function isInMaintenanceMode()
     {
         $maintenanceFile = __DIR__ . '/../../storage/framework/down';
         return file_exists($maintenanceFile);
@@ -35,7 +35,7 @@ class MaintenanceMiddleware implements MiddlewareInterface
     /**
      * Check if current IP is allowed during maintenance
      */
-    protected function isAllowedIP(): bool
+    protected function isAllowedIP()
     {
         $clientIP = $_SERVER['REMOTE_ADDR'] ?? '';
         return in_array($clientIP, $this->allowedIPs);
@@ -118,7 +118,7 @@ class MaintenanceMiddleware implements MiddlewareInterface
     /**
      * Check if request is for API endpoint
      */
-    protected function isApiRequest(array $request): bool
+    protected function isApiRequest(array $request)
     {
         $uri = $request['uri'] ?? $_SERVER['REQUEST_URI'] ?? '';
         return strpos($uri, '/api/') === 0 || 

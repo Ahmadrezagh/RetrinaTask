@@ -54,7 +54,7 @@ class JsonMiddleware implements MiddlewareInterface
     /**
      * Check if request is for API endpoint
      */
-    protected function isApiRequest(array $request): bool
+    protected function isApiRequest(array $request)
     {
         $uri = $request['uri'] ?? $_SERVER['REQUEST_URI'] ?? '';
         return strpos($uri, '/api/') === 0 || 

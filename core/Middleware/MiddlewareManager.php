@@ -70,7 +70,7 @@ class MiddlewareManager
     /**
      * Resolve middleware class from alias
      */
-    public static function resolve(string $middleware): ?string
+    public static function resolve(string $middleware)
     {
         // Check if it's a class name directly
         if (class_exists($middleware)) {
@@ -90,7 +90,7 @@ class MiddlewareManager
     /**
      * Get middleware parameters
      */
-    public static function getParameters(string $middleware): array
+    public static function getParameters(string $middleware)
     {
         if (strpos($middleware, ':') === false) {
             return [];
@@ -103,7 +103,7 @@ class MiddlewareManager
     /**
      * Expand middleware groups
      */
-    public static function expandGroups(array $middleware): array
+    public static function expandGroups(array $middleware)
     {
         $expanded = [];
         
@@ -159,7 +159,7 @@ class MiddlewareManager
     /**
      * Get all registered middleware
      */
-    public static function getRegistered(): array
+    public static function getRegistered()
     {
         return static::$middleware;
     }
@@ -167,7 +167,7 @@ class MiddlewareManager
     /**
      * Get middleware groups
      */
-    public static function getGroups(): array
+    public static function getGroups()
     {
         return static::$middlewareGroups;
     }

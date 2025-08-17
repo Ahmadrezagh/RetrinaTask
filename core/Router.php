@@ -9,11 +9,15 @@ class Router
     private $routes = [];
     private $currentMiddleware = [];
     private $currentPrefix = '';
+    private $basePath;
     
     public function __construct()
     {
         // Bootstrap middleware system
         MiddlewareManager::bootstrap();
+        
+        // Set base path
+        $this->basePath = dirname(__DIR__);
     }
     
     /**
@@ -205,12 +209,39 @@ class Router
         if (is_string($handler) && strpos($handler, '@') !== false) {
             [$controller, $method] = explode('@', $handler);
             
+            // Add namespace prefix if not already present
+            if (strpos($controller, '\\') === false) {
+                $controller = 'App\\Controllers\\' . $controller;
+            }
+            
+            // Ensure controller file is loaded
+            $controllerFile = str_replace('\\', '/', $controller) . '.php';
+            $fullPath = $this->basePath . '/' . $controllerFile;
+            
+            if (file_exists($fullPath)) {
+                require_once $fullPath;
+            }
+            
             if (class_exists($controller)) {
-                $instance = new $controller();
-                if (method_exists($instance, $method)) {
-                    $params = array_slice($matches, 1);
-                    return call_user_func_array([$instance, $method], $params);
+                try {
+                    $instance = new $controller();
+                    if (method_exists($instance, $method)) {
+                        $params = array_slice($matches, 1);
+                        return call_user_func_array([$instance, $method], $params);
+                    } else {
+                        throw new \Exception("Method $method not found in controller $controller");
+                    }
+                } catch (\Error $e) {
+                    $errorDetails = "Failed to instantiate controller $controller: " . $e->getMessage();
+                    $errorDetails .= " (File: " . $e->getFile() . ", Line: " . $e->getLine() . ")";
+                    throw new \Exception($errorDetails);
+                } catch (\ParseError $e) {
+                    $errorDetails = "Parse error in controller $controller: " . $e->getMessage();
+                    $errorDetails .= " (File: " . $e->getFile() . ", Line: " . $e->getLine() . ")";
+                    throw new \Exception($errorDetails);
                 }
+            } else {
+                throw new \Exception("Controller class $controller not found");
             }
         }
         
@@ -257,15 +288,31 @@ class Router
     {
         http_response_code(500);
         
+        // Get additional error details if available
+        $errorMessage = $e->getMessage();
+        $errorDetails = '';
+        
+        if (method_exists($e, 'getFile') && method_exists($e, 'getLine')) {
+            $errorDetails = " (File: " . $e->getFile() . ", Line: " . $e->getLine() . ")";
+        }
+        
         if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
             header('Content-Type: application/json');
             echo json_encode([
                 'status' => 'error',
-                'message' => 'Middleware error: ' . $e->getMessage(),
-                'code' => 500
+                'message' => 'Middleware error: ' . $errorMessage . $errorDetails,
+                'code' => 500,
+                'file' => method_exists($e, 'getFile') ? $e->getFile() : null,
+                'line' => method_exists($e, 'getLine') ? $e->getLine() : null
             ]);
         } else {
-            echo '<h1>500 Internal Server Error</h1><p>Middleware error: ' . htmlspecialchars($e->getMessage()) . '</p>';
+            echo '<h1>500 Internal Server Error</h1>';
+            echo '<p>Middleware error: ' . htmlspecialchars($errorMessage . $errorDetails) . '</p>';
+            if (defined('DEBUG') && DEBUG) {
+                echo '<details><summary>Debug Information</summary>';
+                echo '<pre>' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+                echo '</details>';
+            }
         }
     }
     

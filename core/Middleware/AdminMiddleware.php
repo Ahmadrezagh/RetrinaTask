@@ -33,7 +33,7 @@ class AdminMiddleware implements MiddlewareInterface
     /**
      * Check if user is authenticated
      */
-    protected function isAuthenticated(): bool
+    protected function isAuthenticated()
     {
         return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
     }
@@ -41,7 +41,7 @@ class AdminMiddleware implements MiddlewareInterface
     /**
      * Check if user has admin privileges
      */
-    protected function isAdmin(): bool
+    protected function isAdmin()
     {
         // Check session for admin status
         if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
@@ -55,7 +55,7 @@ class AdminMiddleware implements MiddlewareInterface
     /**
      * Check admin status from database
      */
-    protected function checkAdminStatusFromDatabase(): bool
+    protected function checkAdminStatusFromDatabase()
     {
         try {
             require_once __DIR__ . '/../Database/Connection.php';
@@ -129,7 +129,7 @@ class AdminMiddleware implements MiddlewareInterface
     /**
      * Check if request is for API endpoint
      */
-    protected function isApiRequest(array $request): bool
+    protected function isApiRequest(array $request)
     {
         $uri = $request['uri'] ?? $_SERVER['REQUEST_URI'] ?? '';
         return strpos($uri, '/api/') === 0 || 

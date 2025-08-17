@@ -2,6 +2,10 @@
 
 namespace App\Controllers;
 
+// Manually require dependencies to ensure they're loaded
+require_once __DIR__ . '/../../core/TemplateCompiler.php';
+require_once __DIR__ . '/../../core/ViewEngine.php';
+
 use Core\ViewEngine;
 
 class BaseController

@@ -79,7 +79,7 @@ function printUsage()
     echo "  php retrina.php migrate\n\n";
 }
 
-function parseArguments(array $argv): array
+function parseArguments(array $argv)
 {
     $command = $argv[1] ?? 'help';
     $arguments = [];
@@ -117,7 +117,7 @@ function parseArguments(array $argv): array
     return [$command, $arguments, $options];
 }
 
-function showCommandHelp(string $commandName, CommandRegistry $registry): void
+function showCommandHelp(string $commandName, CommandRegistry $registry)
 {
     $command = $registry->findCommand($commandName);
     
@@ -131,7 +131,7 @@ function showCommandHelp(string $commandName, CommandRegistry $registry): void
     echo $command->getHelp() . "\n";
 }
 
-function listCommands(CommandRegistry $registry): void
+function listCommands(CommandRegistry $registry)
 {
     $grouped = $registry->getGroupedCommands();
     

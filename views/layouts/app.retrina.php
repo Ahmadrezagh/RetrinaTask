@@ -139,8 +139,9 @@ $user = $isAuthenticated ? [
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <form method="POST" action="/logout" class="d-inline">
-                                        <button type="submit" class="dropdown-item text-danger">
+                                    <form method="POST" action="/logout" class="d-inline" id="logoutForm">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item text-danger" onclick="return confirmLogout(event)">
                                             <i class="bi bi-box-arrow-right"></i> Logout
                                         </button>
                                     </form>
@@ -206,6 +207,44 @@ $user = $isAuthenticated ? [
 
     <!-- Bootstrap 5.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Logout Handler -->
+    <script>
+    // Add click handler for logout button
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutForm = document.querySelector('form[action="/logout"]');
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show confirmation
+                if (confirm('Are you sure you want to logout?')) {
+                    // Try to submit the form with proper token
+                    const formData = new FormData(this);
+                    
+                    fetch('/logout', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (response.redirected || response.ok) {
+                            window.location.href = '/';
+                        } else {
+                            // Fallback to GET logout if POST fails
+                            window.location.href = '/logout';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        // Fallback to GET logout
+                        window.location.href = '/logout';
+                    });
+                }
+            });
+        }
+    });
+    </script>
     
     @yield('scripts')
 </body>

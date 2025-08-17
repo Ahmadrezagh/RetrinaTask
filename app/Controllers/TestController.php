@@ -4,12 +4,8 @@ namespace App\Controllers;
 
 class TestController extends BaseController
 {
-    /**
-     * Display the index page
-     */
-    public function index()
+    public function test()
     {
-        // TODO: Implement index method
-        return $this->view('index');
+        return 'TestController works!';
     }
 }

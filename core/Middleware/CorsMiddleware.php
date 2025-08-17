@@ -52,7 +52,7 @@ class CorsMiddleware implements MiddlewareInterface
     /**
      * Check if origin is allowed
      */
-    protected function isOriginAllowed(string $origin): bool
+    protected function isOriginAllowed(string $origin)
     {
         if (in_array('*', $this->allowedOrigins)) {
             return true;
@@ -64,7 +64,7 @@ class CorsMiddleware implements MiddlewareInterface
     /**
      * Set allowed origins
      */
-    public function setAllowedOrigins(array $origins): self
+    public function setAllowedOrigins(array $origins)
     {
         $this->allowedOrigins = $origins;
         return $this;
@@ -73,7 +73,7 @@ class CorsMiddleware implements MiddlewareInterface
     /**
      * Set allowed methods
      */
-    public function setAllowedMethods(array $methods): self
+    public function setAllowedMethods(array $methods)
     {
         $this->allowedMethods = $methods;
         return $this;
@@ -82,7 +82,7 @@ class CorsMiddleware implements MiddlewareInterface
     /**
      * Set allowed headers
      */
-    public function setAllowedHeaders(array $headers): self
+    public function setAllowedHeaders(array $headers)
     {
         $this->allowedHeaders = $headers;
         return $this;
