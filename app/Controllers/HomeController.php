@@ -19,7 +19,7 @@ class HomeController extends BaseController
     {
         $data = [
             'title' => 'Welcome to Retrina Framework',
-            'message' => 'Your custom PHP MVC framework with advanced view engine is working!',
+            'message' => 'Your custom PHP MVC framework with beautiful template syntax is working!',
             'data' => [
                 'framework' => 'Retrina',
                 'version' => '1.0',
@@ -28,6 +28,7 @@ class HomeController extends BaseController
                     'MVC Architecture',
                     'Advanced Routing',
                     'Template Engine',
+                    'Beautiful Syntax',
                     'Layout System',
                     'Section Support',
                     'CSRF Protection',
@@ -37,7 +38,7 @@ class HomeController extends BaseController
             ]
         ];
         
-        // Use the new view structure with layout
+        // Use the new template syntax view
         $this->view('home.index', $data, 'app');
     }
     
@@ -45,7 +46,7 @@ class HomeController extends BaseController
     {
         $data = [
             'title' => 'About Retrina Framework',
-            'message' => 'A lightweight, powerful PHP MVC framework with advanced view engine'
+            'message' => 'A lightweight, powerful PHP MVC framework with beautiful template syntax'
         ];
         
         // Demonstrate using the same view with different data
@@ -67,7 +68,9 @@ class HomeController extends BaseController
                     'XSS protection',
                     'CSRF tokens',
                     'URL generation',
-                    'Old input values'
+                    'Old input values',
+                    'Template compilation',
+                    'Beautiful syntax'
                 ]
             ]
         ];
@@ -80,7 +83,7 @@ class HomeController extends BaseController
     {
         $data = [
             'status' => 'success',
-            'message' => 'API endpoint working with new view engine',
+            'message' => 'API endpoint working with new template engine',
             'framework' => 'Retrina',
             'timestamp' => date('Y-m-d H:i:s'),
             'features' => [
@@ -88,11 +91,41 @@ class HomeController extends BaseController
                 'layouts' => 'Multiple layout support',
                 'sections' => 'Section-based content management',
                 'csrf' => 'CSRF protection enabled',
-                'xss' => 'XSS protection built-in'
+                'xss' => 'XSS protection built-in',
+                'template_syntax' => 'Beautiful {{ }} and @directive syntax',
+                'compilation' => 'Template compilation and caching'
             ]
         ];
         
         $this->json($data);
+    }
+    
+    public function templateDemo()
+    {
+        $data = [
+            'title' => 'Template Syntax Demo - Retrina Framework',
+            'message' => 'Welcome to the beautiful template syntax demo!',
+            'show_features' => true,
+            'demo_mode' => true,
+            'demo_data' => 'This is demo data',
+            'html_content' => '<em>This is <strong>HTML content</strong></em>',
+            'features' => [
+                'Template Inheritance',
+                'Section Management',
+                'Loops & Conditionals',
+                'Form Helpers',
+                'URL Generation',
+                'Asset Management',
+                'CSRF Protection',
+                'XSS Prevention',
+                'Authentication Helpers',
+                'JSON Output',
+                'Debug Helpers',
+                'Custom Directives'
+            ]
+        ];
+        
+        $this->view('demo.template-syntax', $data, 'app');
     }
     
     public function contact()
@@ -150,7 +183,9 @@ class HomeController extends BaseController
                 'layouts' => 'Multiple layout inheritance',
                 'partials' => 'Reusable view components',
                 'helpers' => 'Built-in helper functions',
-                'security' => 'XSS and CSRF protection'
+                'security' => 'XSS and CSRF protection',
+                'syntax' => 'Beautiful template syntax',
+                'compilation' => 'Template compilation and caching'
             ]
         ];
         

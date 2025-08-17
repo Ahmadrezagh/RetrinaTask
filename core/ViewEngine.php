@@ -11,11 +11,14 @@ class ViewEngine
     private $currentSection = null;
     private $layout = null;
     private $extends = null;
+    private $compiler;
+    private $useCompilation = true;
     
     public function __construct($viewPath = null, $layoutPath = null)
     {
         $this->viewPath = $viewPath ?: __DIR__ . '/../views/';
         $this->layoutPath = $layoutPath ?: __DIR__ . '/../views/layouts/';
+        $this->compiler = new TemplateCompiler();
     }
     
     /**
@@ -32,13 +35,24 @@ class ViewEngine
         // Extract data to variables
         extract($this->data);
         
-        // Include the view file
+        // Get view file path
         $viewFile = $this->getViewPath($view);
         if (!file_exists($viewFile)) {
             throw new \Exception("View file not found: {$viewFile}");
         }
         
-        include $viewFile;
+        // Compile template if using compilation
+        if ($this->useCompilation && $this->isTemplateFile($viewFile)) {
+            $compiledPath = $this->compiler->getCompiledPath($viewFile);
+            
+            if ($this->compiler->needsRecompilation($viewFile, $compiledPath)) {
+                $this->compiler->compileFile($viewFile, $compiledPath);
+            }
+            
+            include $compiledPath;
+        } else {
+            include $viewFile;
+        }
         
         // Get the view content
         $content = ob_get_clean();
@@ -70,15 +84,44 @@ class ViewEngine
         // Extract data to variables
         extract($this->data);
         
-        // Include the layout file
+        // Get layout file path
         $layoutFile = $this->getLayoutPath($layout);
         if (!file_exists($layoutFile)) {
             throw new \Exception("Layout file not found: {$layoutFile}");
         }
         
-        include $layoutFile;
+        // Compile layout if using compilation
+        if ($this->useCompilation && $this->isTemplateFile($layoutFile)) {
+            $compiledPath = $this->compiler->getCompiledPath($layoutFile);
+            
+            if ($this->compiler->needsRecompilation($layoutFile, $compiledPath)) {
+                $this->compiler->compileFile($layoutFile, $compiledPath);
+            }
+            
+            include $compiledPath;
+        } else {
+            include $layoutFile;
+        }
         
         return ob_get_clean();
+    }
+    
+    /**
+     * Check if file is a template file (has .retrina.php or .ret.php extension)
+     */
+    private function isTemplateFile($filePath)
+    {
+        return preg_match('/\.(retrina|ret)\.php$/', $filePath) || 
+               (file_exists($filePath) && $this->containsTemplateDirectives($filePath));
+    }
+    
+    /**
+     * Check if file contains template directives
+     */
+    private function containsTemplateDirectives($filePath)
+    {
+        $content = file_get_contents($filePath);
+        return preg_match('/\{\{|\@[a-zA-Z]+/', $content);
     }
     
     /**
@@ -138,7 +181,18 @@ class ViewEngine
             throw new \Exception("Partial view file not found: {$viewFile}");
         }
         
-        include $viewFile;
+        // Compile partial if using compilation
+        if ($this->useCompilation && $this->isTemplateFile($viewFile)) {
+            $compiledPath = $this->compiler->getCompiledPath($viewFile);
+            
+            if ($this->compiler->needsRecompilation($viewFile, $compiledPath)) {
+                $this->compiler->compileFile($viewFile, $compiledPath);
+            }
+            
+            include $compiledPath;
+        } else {
+            include $viewFile;
+        }
     }
     
     /**
@@ -172,6 +226,20 @@ class ViewEngine
     private function getViewPath($view)
     {
         $view = str_replace('.', '/', $view);
+        
+        // Check for template file first
+        $templateFile = $this->viewPath . $view . '.retrina.php';
+        if (file_exists($templateFile)) {
+            return $templateFile;
+        }
+        
+        // Check for .ret.php extension
+        $retFile = $this->viewPath . $view . '.ret.php';
+        if (file_exists($retFile)) {
+            return $retFile;
+        }
+        
+        // Fallback to regular .php file
         return $this->viewPath . $view . '.php';
     }
     
@@ -180,6 +248,19 @@ class ViewEngine
      */
     private function getLayoutPath($layout)
     {
+        // Check for template file first
+        $templateFile = $this->layoutPath . $layout . '.retrina.php';
+        if (file_exists($templateFile)) {
+            return $templateFile;
+        }
+        
+        // Check for .ret.php extension
+        $retFile = $this->layoutPath . $layout . '.ret.php';
+        if (file_exists($retFile)) {
+            return $retFile;
+        }
+        
+        // Fallback to regular .php file
         return $this->layoutPath . $layout . '.php';
     }
     
@@ -264,5 +345,37 @@ class ViewEngine
         $this->clearSections();
         $this->extends = null;
         $this->layout = null;
+    }
+    
+    /**
+     * Get template compiler
+     */
+    public function getCompiler()
+    {
+        return $this->compiler;
+    }
+    
+    /**
+     * Enable/disable template compilation
+     */
+    public function setCompilation($enabled)
+    {
+        $this->useCompilation = $enabled;
+    }
+    
+    /**
+     * Clear template cache
+     */
+    public function clearCache()
+    {
+        $this->compiler->clearCache();
+    }
+    
+    /**
+     * Add custom directive
+     */
+    public function directive($name, $callback)
+    {
+        $this->compiler->directive($name, $callback);
     }
 } 

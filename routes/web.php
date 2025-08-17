@@ -27,6 +27,7 @@ $app->router()->get('/login', 'HomeController@login');
 
 // Demo routes
 $app->router()->get('/demo', 'HomeController@demo');
+$app->router()->get('/demo/template-syntax', 'HomeController@templateDemo');
 
 // Example closure route
 $app->router()->get('/hello/{name}', function($name) {
@@ -44,6 +45,7 @@ $app->router()->get('/api/status', function() {
         'status' => 'success',
         'message' => 'Retrina Framework is running!',
         'view_engine' => 'Advanced Template System',
+        'template_syntax' => 'Blade-like syntax with {{ }} and @directives',
         'timestamp' => date('c'),
         'features' => [
             'layouts',
@@ -51,8 +53,20 @@ $app->router()->get('/api/status', function() {
             'partials',
             'helpers',
             'csrf_protection',
-            'xss_protection'
+            'xss_protection',
+            'template_compilation',
+            'caching'
         ]
+    ]);
+});
+
+// Template cache management
+$app->router()->get('/cache/clear', function() {
+    $viewEngine = new \Core\ViewEngine();
+    $viewEngine->clearCache();
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Template cache cleared successfully'
     ]);
 });
 
