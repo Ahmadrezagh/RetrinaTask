@@ -25,6 +25,14 @@ class DB
     }
     
     /**
+     * Get database connection (public method)
+     */
+    public static function connection()
+    {
+        return static::getConnection();
+    }
+    
+    /**
      * Get a query builder for the given table
      */
     public static function table($table)

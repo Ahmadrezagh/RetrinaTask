@@ -1,560 +1,473 @@
 # 🚀 Retrina Framework
 
-A modern, lightweight PHP MVC framework with a powerful CLI assistant and advanced templating system. Built for developers who want Laravel-like elegance with the simplicity of pure PHP.
+A modern, powerful PHP framework inspired by Laravel, featuring an advanced ORM, comprehensive middleware system, template engine, CLI tools, and robust database management.
 
-[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue.svg)](https://php.net)
+[![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue.svg)](https://php.net/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Framework](https://img.shields.io/badge/Framework-Custom%20MVC-orange.svg)](/)
+[![Framework](https://img.shields.io/badge/Framework-Retrina-purple.svg)](https://github.com)
 
-## ✨ Key Features
+## ✨ Features
 
-### 🎨 **Advanced Template Engine**
-- **Blade-like syntax** with `{{ }}`, `{{{ }}}`, and `{!! !!}` expressions
-- **Template inheritance** with `@extends` and `@section`
-- **Partials support** with `@include`
-- **Custom directives**: `@card`, `@csrf`, `@url`, `@foreach`, `@if`, `@isset`
-- **Comment syntax** with `{{-- --}}`
-- **Template compilation** and caching for performance
-- **XSS protection** by default
+### 🏗️ Core Architecture
+- **MVC Pattern** - Clean separation of concerns with Models, Views, and Controllers
+- **Dependency Injection** - Modern IoC container for better code organization
+- **PSR-4 Autoloading** - Standard PHP autoloading with namespace support
+- **Error Handling** - Comprehensive error reporting and debugging tools
 
-### 🛠️ **Powerful CLI Assistant**
-Complete command-line tools for rapid development:
+### 🗄️ Database & ORM
+- **Laravel-like ORM** - Eloquent-style model relationships and query building
+- **Query Builder** - Fluent interface for complex database queries
+- **Schema Builder** - Database-agnostic schema definitions
+- **Multi-Database Support** - MySQL, PostgreSQL, and SQLite compatibility
+- **Migration System** - Version control for your database schema
+- **Database Seeding** - Populate your database with test data
 
-```bash
-# Development server
-php retrina serve                    # Start on port 8585
-php retrina serve --port=8080        # Custom port
-php retrina serve --open             # Auto-open browser
+### 🛡️ Security & Middleware
+- **Comprehensive Middleware System** - Authentication, authorization, CORS, rate limiting
+- **CSRF Protection** - Built-in cross-site request forgery protection
+- **Session Management** - Secure session handling with customizable drivers
+- **Role-based Access Control** - User roles and permissions system
+- **Input Validation** - Request validation and sanitization
 
-# Code generation
-php retrina make:controller UserController
-php retrina make:controller PostController --resource
-php retrina make:model User --migration
-php retrina make:api-controller UserApiController --resource
-php retrina make:view users/index --resource
-php retrina make:migration CreatePostsTable --create=posts
+### 🎨 Templating & Views
+- **Blade-like Template Engine** - Familiar syntax with advanced features
+- **Template Inheritance** - Layout system with sections and yields
+- **Component System** - Reusable template components
+- **Template Caching** - Compiled templates for better performance
+- **Responsive Views** - Bootstrap 5 integration for modern UI
 
-# Database management
-php retrina migrate                  # Run migrations
-php retrina migrate --status         # Check migration status
-php retrina migrate --rollback=3     # Rollback last 3 migrations
+### ⚡ CLI Tools (Retrina Artisan)
+- **Code Generation** - Generate models, controllers, views, and migrations
+- **Database Management** - Migration and seeding commands
+- **Development Server** - Built-in development server with hot reloading
+- **Route Management** - List and analyze your application routes
 
-# Route management
-php retrina route:list              # List all routes
-php retrina route:list --method=GET # Filter by HTTP method
-php retrina route:list --uri=api    # Filter by URI pattern
-```
-
-### 🗄️ **Elegant ORM & Database**
-- **Active Record pattern** with Laravel-like syntax
-- **Migration system** with up/down methods
-- **Multi-database support**: SQLite, MySQL, PostgreSQL
-- **Query builder** with method chaining
-- **Model relationships** and attribute casting
-- **Automatic timestamps** and password hashing
-
-### 🌐 **RESTful API Support**
-- **Separate API routes** in `routes/api.php`
-- **JSON responses** with proper HTTP status codes
-- **API controller generation** with CRUD methods
-- **Built-in health check** and documentation endpoints
-
-### 🔒 **Security Features**
-- **CSRF protection** with token generation
-- **XSS prevention** with automatic HTML escaping
-- **Password hashing** with PHP's `password_hash()`
-- **Input validation** and sanitization
-- **Environment-based configuration**
+### 🌐 API & Routing
+- **RESTful Routing** - Clean URL patterns with parameter binding
+- **API Support** - JSON responses and API middleware
+- **Route Groups** - Organize routes with shared middleware and prefixes
+- **Route Caching** - Optimized routing for production environments
 
 ## 🚀 Quick Start
 
-### Installation
+### Prerequisites
+- PHP 8.2 or higher
+- Composer (optional, framework is self-contained)
+- MySQL, PostgreSQL, or SQLite
 
+### Installation
 ```bash
 # Clone the repository
-git clone <repository-url> retrina-project
-cd retrina-project
+git clone https://github.com/your-repo/retrina-framework.git
+cd retrina-framework
+
+# Set up environment
+cp .env.example .env
+# Edit .env with your database configuration
+
+# Set up database
+php retrina migrate:fresh --seed
+```
+
+### Development Server
+```bash
+# Start the development server
+php retrina serve
+
+# Custom port
+php retrina serve --port=8080
+
+# Your app is now running at http://localhost:8585
+```
+
+## 📚 Documentation
+
+### Database Configuration
+Configure your database in the `.env` file:
+
+```env
+# Database Configuration
+DB_DRIVER=mysql          # mysql, sqlite, postgres
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=retrina_framework
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
+
+### CLI Commands
+
+#### Database Commands
+```bash
+# Run migrations
+php retrina migrate
+
+# Fresh migration with seeders
+php retrina migrate:fresh --seed
+
+# Rollback migrations
+php retrina migrate:rollback
+
+# Database seeding
+php retrina db:seed
+php retrina db:seed --class=UserSeeder
+```
+
+#### Code Generation
+```bash
+# Generate model
+php retrina make:model User
+php retrina make:model Post -m  # with migration
+
+# Generate controller
+php retrina make:controller UserController
+php retrina make:controller PostController -r  # resource controller
+
+# Generate migration
+php retrina make:migration create_posts_table
+
+# Generate seeder
+php retrina make:seeder UserSeeder
+
+# Generate view
+php retrina make:view posts.index
+```
+
+#### Development Tools
+```bash
+# Start development server
+php retrina serve --port=8585
+
+# List all routes
+php retrina route:list
+
+# List available commands
+php retrina list
+```
+
+### Database Usage
+
+#### Models
+```php
+<?php
+namespace App\Models;
+
+use Core\Database\Model;
+
+class User extends Model
+{
+    protected $table = 'users';
+    protected $fillable = ['username', 'email', 'password', 'role'];
+    
+    // Relationships
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+}
+
+// Usage examples
+$users = User::all();
+$user = User::find(1);
+$admins = User::where('role', 'admin')->get();
+$user = User::create([
+    'username' => 'john',
+    'email' => 'john@example.com',
+    'password' => password_hash('secret', PASSWORD_DEFAULT),
+    'role' => 'user'
+]);
+```
+
+#### Query Builder
+```php
+use Core\Database\DB;
+
+// Basic queries
+$users = DB::table('users')->get();
+$user = DB::table('users')->where('id', 1)->first();
+
+// Advanced queries
+$results = DB::table('users')
+    ->select(['username', 'email'])
+    ->where('role', 'admin')
+    ->orderBy('created_at', 'desc')
+    ->limit(10)
+    ->get();
+
+// Joins
+$posts = DB::table('posts')
+    ->join('users', 'posts.user_id', '=', 'users.id')
+    ->select(['posts.*', 'users.username'])
+    ->where('posts.published', true)
+    ->get();
+```
+
+#### Migrations
+```php
+<?php
+use Core\Database\Schema\Schema;
+use Core\Migration;
+
+class CreatePostsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('posts', function($table) {
+            $table->id();
+            $table->string('title');
+            $table->text('content');
+            $table->integer('user_id');
+            $table->boolean('published')->default(false);
+            $table->timestamps();
+            
+            $table->foreign('user_id')->references('id')->on('users');
+        });
+    }
+    
+    public function down()
+    {
+        Schema::dropIfExists('posts');
+    }
+}
+```
+
+### Routing & Controllers
+
+#### Route Definition
+```php
+// routes/web.php
+$router->get('/', function() {
+    return view('home/index');
+});
+
+$router->get('/users/{id}', 'UserController@show');
+
+$router->group(['middleware' => ['auth']], function($router) {
+    $router->get('/dashboard', 'DashboardController@index');
+    $router->resource('/posts', 'PostController');
+});
+
+// API routes (routes/api.php)
+$router->group(['middleware' => ['api']], function($router) {
+    $router->get('/api/users', function() {
+        return json_encode(User::all());
+    });
+});
+```
+
+#### Controllers
+```php
+<?php
+namespace App\Controllers;
+
+use Core\BaseController;
+use App\Models\User;
+
+class UserController extends BaseController
+{
+    public function index()
+    {
+        $users = User::all();
+        return view('users/index', compact('users'));
+    }
+    
+    public function show($id)
+    {
+        $user = User::find($id);
+        return view('users/show', compact('user'));
+    }
+    
+    public function store()
+    {
+        $user = User::create($_POST);
+        return redirect('/users');
+    }
+}
+```
+
+### Views & Templates
+
+#### Template Syntax
+```php
+{{-- views/layouts/app.retrina.php --}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@yield('title', 'Retrina Framework')</title>
+</head>
+<body>
+    <nav>@include('partials/navigation')</nav>
+    <main>@yield('content')</main>
+    <footer>@yield('footer')</footer>
+</body>
+</html>
+
+{{-- views/users/index.retrina.php --}}
+@extends('layouts.app')
+
+@section('title', 'Users')
+
+@section('content')
+<div class="container">
+    <h1>Users</h1>
+    @foreach($users as $user)
+        <div class="user-card">
+            <h3>{{ $user['username'] }}</h3>
+            <p>{{ $user['email'] }}</p>
+            @if($user['role'] === 'admin')
+                <span class="badge">Admin</span>
+            @endif
+        </div>
+    @endforeach
+</div>
+@endsection
+```
+
+### Middleware System
+
+#### Available Middleware
+- **auth** - Require authentication
+- **guest** - Allow only non-authenticated users
+- **admin** - Require admin role
+- **cors** - Handle CORS headers
+- **csrf** - CSRF protection
+- **throttle** - Rate limiting
+- **json** - JSON request/response handling
+
+#### Middleware Usage
+```php
+// Apply to individual routes
+$router->get('/dashboard', 'DashboardController@index', ['auth']);
+
+// Apply to route groups
+$router->group(['middleware' => ['auth', 'admin']], function($router) {
+    $router->get('/admin', 'AdminController@index');
+    $router->resource('/admin/users', 'AdminUserController');
+});
+
+// API middleware
+$router->group(['middleware' => ['api', 'throttle:60,1']], function($router) {
+    $router->get('/api/data', 'ApiController@getData');
+});
+```
+
+## 🛡️ Security Features
+
+### Authentication
+```php
+// Login
+if (password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['user_role'] = $user['role'];
+}
+
+// Logout
+unset($_SESSION['user_id'], $_SESSION['username'], $_SESSION['user_role']);
+```
+
+### CSRF Protection
+```php
+{{-- In forms --}}
+<form method="POST" action="/users">
+    @csrf
+    <input type="text" name="username" required>
+    <button type="submit">Create User</button>
+</form>
+```
+
+### Role-based Access
+```php
+// Check roles in controllers
+if (!User::isAdmin($_SESSION)) {
+    return redirect('/unauthorized');
+}
+
+// Or use admin middleware
+$router->get('/admin', 'AdminController@index', ['admin']);
+```
+
+## 🧪 Testing & Development
+
+### Demo Credentials
+After running `php retrina migrate:fresh --seed`:
+
+**Admin Account:**
+- Username: `admin`
+- Password: `admin123`
+- Email: `admin@retrina.local`
+- Role: `admin`
+
+**User Account:**
+- Username: `user`
+- Password: `user123`
+- Email: `user@retrina.local`
+- Role: `user`
+
+### Development Workflow
+```bash
+# Start fresh development environment
+php retrina migrate:fresh --seed
 
 # Start development server
 php retrina serve
 
-# Visit http://localhost:8585
-```
+# Generate new components
+php retrina make:model Product -m
+php retrina make:controller ProductController -r
+php retrina make:view products.index
 
-### Create Your First Model
-
-```bash
-# Generate model with migration
-php retrina make:model Product --migration
-
-# Edit the migration file
-# database/migrations/YYYY_MM_DD_HHMMSS_create_products_table.php
-
-# Run migration
-php retrina migrate
-```
-
-### Generate a Controller
-
-```bash
-# Basic controller
-php retrina make:controller ProductController
-
-# Resource controller with CRUD methods
-php retrina make:controller ProductController --resource
-
-# API controller
-php retrina make:api-controller ProductApiController --resource
-```
-
-### Create Views
-
-```bash
-# Single view
-php retrina make:view products/index
-
-# Complete CRUD views
-php retrina make:view products/index --resource
+# Test your changes
+curl http://localhost:8585/api/users
 ```
 
 ## 📁 Project Structure
 
 ```
 retrina-framework/
-├── 📁 app/
-│   ├── 📁 Controllers/         # HTTP controllers
-│   │   ├── 📁 Api/            # API controllers
-│   │   ├── BaseController.php
-│   │   └── HomeController.php
-│   └── 📁 Models/             # Data models
-│       ├── BaseModel.php      # ORM base class
-│       └── User.php           # User model
-├── 📁 config/
-│   └── database.php           # Database configuration
-├── 📁 core/                   # Framework core
-│   ├── 📁 Command/            # CLI commands
-│   ├── Application.php        # Main application
-│   ├── Router.php             # HTTP routing
-│   ├── ViewEngine.php         # Template engine
-│   ├── Migration.php          # Database migrations
-│   └── Environment.php        # Environment handling
-├── 📁 database/
-│   └── 📁 migrations/         # Database migrations
-├── 📁 routes/
-│   ├── web.php               # Web routes
-│   └── api.php               # API routes
-├── 📁 storage/
-│   ├── 📁 cache/             # Template cache
-│   └── database.sqlite       # SQLite database
-├── 📁 views/                 # Template files
-│   ├── 📁 layouts/           # Layout templates
-│   ├── 📁 partials/          # Partial templates
-│   └── 📁 components/        # Reusable components
-├── .env                      # Environment variables
-├── .env.example              # Environment template
-├── index.php                 # Application entry point
-├── retrina.php               # CLI entry point
-└── retrina                   # CLI launcher script
+├── app/
+│   ├── Controllers/           # Application controllers
+│   └── Models/               # Eloquent models
+├── core/                     # Framework core files
+│   ├── Command/              # CLI command system
+│   ├── Database/             # ORM and database tools
+│   ├── Middleware/           # Middleware classes
+│   └── ...                   # Other core components
+├── database/
+│   ├── migrations/           # Database migrations
+│   └── seeders/              # Database seeders
+├── routes/
+│   ├── web.php              # Web routes
+│   └── api.php              # API routes
+├── views/                    # Template files
+│   ├── layouts/             # Layout templates
+│   ├── auth/                # Authentication views
+│   └── ...                  # Other view directories
+├── storage/
+│   ├── cache/               # Template and other cache
+│   └── logs/                # Application logs
+├── .env                     # Environment configuration
+└── retrina                  # CLI entry point
 ```
-
-## 🎨 Template System
-
-### Basic Syntax
-
-```php
-{{-- resources/views/users/index.retrina.php --}}
-@extends('layouts.app')
-
-@section('title', 'Users List')
-
-@section('content')
-    <div class="container">
-        <h1>{{ $pageTitle }}</h1>
-        
-        @if(isset($users) && count($users) > 0)
-            @foreach($users as $user)
-                @card
-                    <h5>{{ $user->full_name }}</h5>
-                    <p class="text-muted">{{ $user->email }}</p>
-                    <small>Active: {!! $user->is_active ? '<span class="text-success">Yes</span>' : '<span class="text-danger">No</span>' !!}</small>
-                @endcard
-            @endforeach
-        @else
-            <div class="alert alert-info">
-                No users found.
-            </div>
-        @endif
-    </div>
-@endsection
-```
-
-### Custom Directives
-
-```php
-{{-- CSRF Protection --}}
-@csrf
-
-{{-- URL Generation --}}
-<a href="@url('/users/create')">Create User</a>
-
-{{-- Custom Card Component --}}
-@card
-    <h5>Card Title</h5>
-    <p>Card content goes here</p>
-@endcard
-
-{{-- Safe HTML Output --}}
-{!! $htmlContent !!}
-
-{{-- Escaped Output (default) --}}
-{{ $userInput }}
-
-{{-- Raw Output --}}
-{{{ $trustedContent }}}
-```
-
-## 🗄️ Database & Models
-
-### Model Definition
-
-```php
-<?php
-
-namespace App\Models;
-
-class User extends BaseModel
-{
-    protected $table = 'users';
-    
-    protected $fillable = [
-        'username', 'email', 'password', 
-        'first_name', 'last_name', 'is_active'
-    ];
-    
-    protected $hidden = ['password', 'remember_token'];
-    
-    protected $casts = [
-        'is_active' => 'boolean',
-        'email_verified_at' => 'datetime'
-    ];
-    
-    // Automatic password hashing
-    public function setPasswordAttribute($value)
-    {
-        $this->attributes['password'] = password_hash($value, PASSWORD_DEFAULT);
-    }
-    
-    // Custom accessor
-    public function getFullNameAttribute()
-    {
-        return $this->first_name . ' ' . $this->last_name;
-    }
-    
-    // Static query methods
-    public static function findByEmail($email)
-    {
-        return static::where('email', $email)->first();
-    }
-    
-    public static function active()
-    {
-        return static::where('is_active', true);
-    }
-}
-```
-
-### Using Models
-
-```php
-// Create users
-$user = User::create([
-    'username' => 'john_doe',
-    'email' => 'john@example.com',
-    'password' => 'secret123',
-    'first_name' => 'John',
-    'last_name' => 'Doe'
-]);
-
-// Query users
-$users = User::all();
-$activeUsers = User::active()->get();
-$user = User::findByEmail('john@example.com');
-
-// Update and verify
-$user->updateLastLogin();
-if ($user->verifyPassword('secret123')) {
-    echo 'Password correct!';
-}
-```
-
-### Migrations
-
-```php
-<?php
-
-use Core\Migration;
-
-class CreateUsersTable extends Migration
-{
-    public function up()
-    {
-        $columns = [
-            '`id` INT AUTO_INCREMENT PRIMARY KEY',
-            '`username` VARCHAR(50) NOT NULL UNIQUE',
-            '`email` VARCHAR(100) NOT NULL UNIQUE',
-            '`password` VARCHAR(255) NOT NULL',
-            '`first_name` VARCHAR(50) NOT NULL',
-            '`last_name` VARCHAR(50) NOT NULL',
-            '`is_active` BOOLEAN NOT NULL DEFAULT TRUE',
-            ...$this->timestamps()
-        ];
-        
-        $this->createTable('users', $columns);
-    }
-    
-    public function down()
-    {
-        $this->dropTable('users');
-    }
-}
-```
-
-## 🌐 API Development
-
-### API Controller
-
-```php
-<?php
-
-namespace App\Controllers\Api;
-
-use App\Controllers\BaseController;
-use App\Models\User;
-
-class UserApiController extends BaseController
-{
-    public function index()
-    {
-        $users = User::all();
-        
-        return $this->jsonResponse([
-            'status' => 'success',
-            'data' => $users,
-            'count' => count($users)
-        ]);
-    }
-    
-    public function store()
-    {
-        $input = $this->getJsonInput();
-        
-        // Validation
-        $required = ['username', 'email', 'first_name', 'last_name'];
-        $missing = [];
-        
-        foreach ($required as $field) {
-            if (!isset($input[$field]) || empty($input[$field])) {
-                $missing[] = $field;
-            }
-        }
-        
-        if (!empty($missing)) {
-            return $this->jsonError(
-                'Missing required fields: ' . implode(', ', $missing),
-                400,
-                'VALIDATION_ERROR'
-            );
-        }
-        
-        $user = User::create($input);
-        
-        return $this->jsonResponse([
-            'status' => 'success',
-            'message' => 'User created successfully',
-            'data' => $user
-        ], 201);
-    }
-}
-```
-
-### API Routes
-
-```php
-<?php
-// routes/api.php
-
-// Health check
-$router->get('/api/health', function() {
-    header('Content-Type: application/json');
-    echo json_encode([
-        'status' => 'healthy',
-        'timestamp' => date('c'),
-        'database' => 'connected'
-    ]);
-});
-
-// User API endpoints  
-$router->get('/api/users', 'Api\UserApiController@index');
-$router->post('/api/users', 'Api\UserApiController@store');
-$router->get('/api/users/(\d+)', 'Api\UserApiController@show');
-$router->put('/api/users/(\d+)', 'Api\UserApiController@update');
-$router->delete('/api/users/(\d+)', 'Api\UserApiController@destroy');
-```
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-```bash
-# .env
-APP_NAME="Retrina Framework"
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost:8585
-
-DB_DRIVER=sqlite
-DB_HOST=localhost
-DB_PORT=3306
-DB_DATABASE=retrina_framework
-DB_USERNAME=root
-DB_PASSWORD=
-DB_SQLITE_PATH=storage/database.sqlite
-```
-
-### Database Configuration
-
-```php
-<?php
-// config/database.php
-
-use Core\Environment;
-
-$driver = Environment::get('DB_DRIVER', 'sqlite');
-
-if ($driver === 'sqlite') {
-    return [
-        'driver' => 'sqlite',
-        'database' => __DIR__ . '/../' . Environment::get('DB_SQLITE_PATH', 'storage/database.sqlite')
-    ];
-} elseif ($driver === 'mysql') {
-    return [
-        'driver' => 'mysql',
-        'host' => Environment::get('DB_HOST', 'localhost'),
-        'port' => Environment::get('DB_PORT', 3306),
-        'database' => Environment::get('DB_DATABASE'),
-        'username' => Environment::get('DB_USERNAME'),
-        'password' => Environment::get('DB_PASSWORD'),
-        'charset' => Environment::get('DB_CHARSET', 'utf8mb4'),
-        'options' => [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]
-    ];
-}
-```
-
-## 🧪 Testing & Development
-
-### Development Server
-
-```bash
-# Start development server
-php retrina serve
-
-# Custom port
-php retrina serve --port=8080
-
-# Bind to all interfaces  
-php retrina serve --host=0.0.0.0
-
-# Auto-open browser
-php retrina serve --open
-```
-
-### Route Debugging
-
-```bash
-# List all routes
-php retrina route:list
-
-# Filter by method
-php retrina route:list --method=GET
-
-# Filter by URI pattern
-php retrina route:list --uri=api
-```
-
-### Migration Management
-
-```bash
-# Check migration status
-php retrina migrate --status
-
-# Run migrations
-php retrina migrate
-
-# Rollback migrations
-php retrina migrate --rollback=3
-php retrina migrate --rollback-all
-```
-
-## 🔧 Available CLI Commands
-
-### Code Generation
-- `make:controller` - Generate controller classes
-- `make:model` - Generate model classes  
-- `make:migration` - Generate migration files
-- `make:view` - Generate view templates
-- `make:api-controller` - Generate API controllers
-
-### Development Tools
-- `serve` - Start development server
-- `migrate` - Database migration management
-- `route:list` - Display registered routes
-
-### Command Options
-- `--resource` - Generate resource controllers/views with CRUD methods
-- `--migration` / `-m` - Create migration when generating models
-- `--force` / `-f` - Overwrite existing files
-- `--create=table` - Create new table migration
-- `--table=table` - Modify existing table migration
-
-## 🚀 Performance Features
-
-- **Template compilation** and caching
-- **Optimized routing** with pattern matching
-- **Database connection pooling**
-- **Lazy loading** of framework components
-- **Minimal memory footprint**
-
-## 🛡️ Security
-
-- **CSRF protection** built-in
-- **XSS prevention** with automatic escaping
-- **SQL injection protection** with prepared statements
-- **Password hashing** with `password_hash()`
-- **Environment-based secrets** management
-
-## 📈 What's Next
-
-- [ ] Middleware system
-- [ ] Authentication guards
-- [ ] Event system
-- [ ] Queue management
-- [ ] File upload handling
-- [ ] Email integration
-- [ ] Testing framework
-- [ ] Package management
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is open-sourced software licensed under the [MIT license](LICENSE).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Inspired by Laravel's elegant syntax and features
+- Built with modern PHP best practices
+- Bootstrap 5 for beautiful, responsive UI components
 
 ---
 
-**Built with ❤️ for modern PHP development** 
+**Retrina Framework** - *Modern PHP development made simple* 🚀 

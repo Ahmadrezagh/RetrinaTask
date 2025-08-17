@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('last_name', 50);
             $table->string('avatar')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->enum('role', ['user', 'admin'])->default('user');
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_login_at')->nullable();
             $table->string('remember_token', 100)->nullable();
@@ -29,18 +30,6 @@ class CreateUsersTable extends Migration
             $table->index('username');
             $table->index(['is_active', 'email_verified_at']);
         });
-        
-        // Insert demo users
-        $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
-        $demoPassword = password_hash('demo123', PASSWORD_DEFAULT);
-        $testPassword = password_hash('test123', PASSWORD_DEFAULT);
-        
-        $this->executeSQL("
-            INSERT INTO users (username, email, password, first_name, last_name, is_active, created_at, updated_at) VALUES
-            ('admin', 'admin@retrina.local', '{$adminPassword}', 'Admin', 'User', 1, NOW(), NOW()),
-            ('demo', 'demo@retrina.local', '{$demoPassword}', 'Demo', 'User', 1, NOW(), NOW()),
-            ('test', 'test@retrina.local', '{$testPassword}', 'Test', 'User', 1, NOW(), NOW())
-        ", "Inserting demo users");
     }
 
     public function down()

@@ -213,4 +213,50 @@ class User
                 ->count()
         ];
     }
+    
+    /**
+     * Check if user has admin role
+     */
+    public static function isAdmin($user)
+    {
+        if (is_array($user)) {
+            return isset($user['role']) && $user['role'] === 'admin';
+        }
+        return false;
+    }
+    
+    /**
+     * Check if user has user role
+     */
+    public static function isUser($user)
+    {
+        if (is_array($user)) {
+            return isset($user['role']) && $user['role'] === 'user';
+        }
+        return false;
+    }
+    
+    /**
+     * Get users by role
+     */
+    public static function byRole($role)
+    {
+        return DB::table(static::$table)->where('role', $role)->get();
+    }
+    
+    /**
+     * Get all admin users
+     */
+    public static function admins()
+    {
+        return static::byRole('admin');
+    }
+    
+    /**
+     * Get all regular users
+     */
+    public static function users()
+    {
+        return static::byRole('user');
+    }
 }
