@@ -15,9 +15,6 @@ $app->router()->get('/about', 'HomeController@about');
 // User routes with parameters
 $app->router()->get('/user/{id}', 'HomeController@user');
 
-// API routes
-$app->router()->get('/api', 'HomeController@api');
-
 // Contact routes
 $app->router()->get('/contact', 'HomeController@contact');
 $app->router()->post('/contact', 'HomeController@contact');
@@ -36,28 +33,6 @@ $app->router()->get('/hello/{name}', function($name) {
     echo "<p style='color: #666;'>This is a closure route in Retrina Framework</p>";
     echo "<a href='" . url('/') . "' style='color: #667eea; text-decoration: none;'>← Back to Home</a>";
     echo "</div>";
-});
-
-// API endpoint with closure
-$app->router()->get('/api/status', function() {
-    header('Content-Type: application/json');
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Retrina Framework is running!',
-        'view_engine' => 'Advanced Template System',
-        'template_syntax' => 'Blade-like syntax with {{ }} and @directives',
-        'timestamp' => date('c'),
-        'features' => [
-            'layouts',
-            'sections',
-            'partials',
-            'helpers',
-            'csrf_protection',
-            'xss_protection',
-            'template_compilation',
-            'caching'
-        ]
-    ]);
 });
 
 // Template cache management

@@ -5,68 +5,108 @@ namespace App\Models;
 class User extends BaseModel
 {
     protected $table = 'users';
+    protected $fillable = [
+        'username',
+        'email', 
+        'password',
+        'first_name',
+        'last_name',
+        'avatar',
+        'email_verified_at',
+        'is_active',
+        'last_login_at',
+        'remember_token'
+    ];
+    
+    protected $hidden = [
+        'password',
+        'remember_token'
+    ];
+    
+    protected $casts = [
+        'is_active' => 'boolean',
+        'email_verified_at' => 'datetime',
+        'last_login_at' => 'datetime'
+    ];
     
     /**
-     * Find user by email
+     * Hash password before saving
      */
-    public function findByEmail($email)
+    public function setPasswordAttribute($value)
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE email = :email");
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        $this->attributes['password'] = password_hash($value, PASSWORD_DEFAULT);
     }
     
     /**
-     * Create a new user with validation
+     * Get full name
      */
-    public function createUser($userData)
+    public function getFullNameAttribute()
     {
-        // Basic validation
-        if (empty($userData['name']) || empty($userData['email'])) {
-            throw new \Exception("Name and email are required");
-        }
-        
-        // Check if email already exists
-        if ($this->findByEmail($userData['email'])) {
-            throw new \Exception("Email already exists");
-        }
-        
-        // Hash password if provided
-        if (isset($userData['password'])) {
-            $userData['password'] = password_hash($userData['password'], PASSWORD_DEFAULT);
-        }
-        
-        // Add timestamps
-        $userData['created_at'] = date('Y-m-d H:i:s');
-        $userData['updated_at'] = date('Y-m-d H:i:s');
-        
-        return $this->create($userData);
+        return trim($this->first_name . ' ' . $this->last_name);
     }
     
     /**
-     * Update user with timestamps
+     * Check if user is active
      */
-    public function updateUser($id, $userData)
+    public function isActive()
     {
-        // Add updated timestamp
-        $userData['updated_at'] = date('Y-m-d H:i:s');
-        
-        // Hash password if being updated
-        if (isset($userData['password'])) {
-            $userData['password'] = password_hash($userData['password'], PASSWORD_DEFAULT);
-        }
-        
-        return $this->update($id, $userData);
+        return $this->is_active === true;
     }
     
     /**
-     * Get all active users
+     * Check if email is verified
      */
-    public function getActiveUsers()
+    public function isEmailVerified()
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE status = 'active' ORDER BY created_at DESC");
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->email_verified_at !== null;
+    }
+    
+    /**
+     * Verify password
+     */
+    public function verifyPassword($password)
+    {
+        return password_verify($password, $this->password);
+    }
+    
+    /**
+     * Update last login timestamp
+     */
+    public function updateLastLogin()
+    {
+        $this->last_login_at = date('Y-m-d H:i:s');
+        return $this->save();
+    }
+    
+    /**
+     * Get user by email
+     */
+    public static function findByEmail($email)
+    {
+        return static::where('email', $email)->first();
+    }
+    
+    /**
+     * Get user by username
+     */
+    public static function findByUsername($username)
+    {
+        return static::where('username', $username)->first();
+    }
+    
+    /**
+     * Get active users
+     */
+    public static function active()
+    {
+        return static::where('is_active', true);
+    }
+    
+    /**
+     * Get verified users
+     */
+    public static function verified()
+    {
+        return static::whereNotNull('email_verified_at');
     }
 } 

@@ -18,8 +18,8 @@ require_once __DIR__ . '/core/Application.php';
 // Create application instance
 $app = new \Core\Application(__DIR__);
 
-// Load routes
-require_once __DIR__ . '/routes/web.php';
+// Load routes (both web and API)
+$app->loadRoutes();
 
 // Run the application
 $app->run();

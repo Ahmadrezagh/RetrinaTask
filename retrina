@@ -1,0 +1,33 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Retrina Framework - CLI Launcher
+ * 
+ * This is a simple launcher that forwards all arguments to retrina.php
+ * Usage: php retrina [command] [arguments] [options]
+ */
+
+// Get the directory where this script is located
+$scriptDir = __DIR__;
+
+// Path to the actual retrina.php file
+$retrinaScript = $scriptDir . '/retrina.php';
+
+// Check if retrina.php exists
+if (!file_exists($retrinaScript)) {
+    echo "Error: retrina.php not found in {$scriptDir}\n";
+    exit(1);
+}
+
+// Forward all arguments to retrina.php
+$command = "php " . escapeshellarg($retrinaScript);
+
+// Add all command line arguments (excluding the script name)
+for ($i = 1; $i < $argc; $i++) {
+    $command .= " " . escapeshellarg($argv[$i]);
+}
+
+// Execute the command and forward the exit code
+passthru($command, $exitCode);
+exit($exitCode); 

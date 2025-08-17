@@ -11,6 +11,7 @@ class Application
     {
         $this->basePath = $basePath ?: dirname(__DIR__);
         
+        $this->loadEnvironment();
         $this->startSession();
         $this->loadHelpers();
         $this->registerAutoloader();
@@ -18,6 +19,15 @@ class Application
         
         // Router must be instantiated after autoloader is registered
         $this->router = new Router();
+    }
+    
+    /**
+     * Load environment variables
+     */
+    private function loadEnvironment()
+    {
+        require_once $this->basePath . '/core/Environment.php';
+        \Core\Environment::load($this->basePath . '/.env');
     }
     
     /**
@@ -124,6 +134,25 @@ class Application
     private function isDebugMode()
     {
         return defined('DEBUG') && DEBUG === true;
+    }
+    
+    /**
+     * Load routes from routes files
+     */
+    public function loadRoutes()
+    {
+        $app = $this;
+        
+        // Load web routes
+        if (file_exists($this->basePath . '/routes/web.php')) {
+            require $this->basePath . '/routes/web.php';
+        }
+        
+        // Load API routes
+        if (file_exists($this->basePath . '/routes/api.php')) {
+            $router = $this->router;
+            require $this->basePath . '/routes/api.php';
+        }
     }
     
     /**
