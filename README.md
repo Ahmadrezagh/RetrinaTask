@@ -37,10 +37,12 @@ A modern, powerful PHP framework inspired by Laravel, featuring an advanced ORM,
 - **Responsive Views** - Bootstrap 5 integration for modern UI
 
 ### ⚡ CLI Tools (Retrina Artisan)
-- **Code Generation** - Generate models, controllers, views, and migrations
-- **Database Management** - Migration and seeding commands
-- **Development Server** - Built-in development server with hot reloading
+- **Code Generation** - Generate models, controllers, API controllers, views, and migrations
+- **Database Management** - Migration and seeding commands with fresh migration support
+- **Development Server** - Built-in development server with custom port support
 - **Route Management** - List and analyze your application routes
+- **Testing Framework** - Comprehensive test suite with Feature, API, Unit, and Web tests
+- **Cache Management** - Clear compiled view cache and optimize performance
 
 ### 🌐 API & Routing
 - **RESTful Routing** - Clean URL patterns with parameter binding
@@ -123,6 +125,9 @@ php retrina make:model Post -m  # with migration
 php retrina make:controller UserController
 php retrina make:controller PostController -r  # resource controller
 
+# Generate API controller
+php retrina make:api-controller ApiController
+
 # Generate migration
 php retrina make:migration create_posts_table
 
@@ -143,6 +148,14 @@ php retrina route:list
 
 # List available commands
 php retrina list
+
+# Run tests
+php retrina test
+php retrina test --verbose
+php retrina test tests/Feature/
+
+# Clear view cache
+php retrina view:clear
 ```
 
 ### Database Usage

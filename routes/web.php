@@ -93,10 +93,10 @@ $router->group(['middleware' => ['web']], function($router) {
     $router->get('/test', 'DemoController@test');
     $router->get('/test-controller', 'TestController@test');
     $router->get('/test-view', 'DemoController@testView');
-    $router->get('/test-home', 'DemoController@testHome');
+        $router->get('/test-home', 'DemoController@testHome');
+    
+    // Template demo route
+    $router->get('/demo/template-syntax', 'DemoController@templateSyntax');
 });
-
-// Template demo route
-$router->get('/demo/template-syntax', 'DemoController@templateSyntax');
 
  

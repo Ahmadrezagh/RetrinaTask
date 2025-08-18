@@ -70,7 +70,20 @@ class DemoController extends BaseController
         return view('demo/template-syntax', [
             'title' => 'Template Syntax Demo',
             'items' => ['Apple', 'Banana', 'Cherry'],
-            'user' => ['name' => 'John Doe', 'email' => 'john@example.com']
+            'user' => ['name' => 'John Doe', 'email' => 'john@example.com'],
+            'message' => 'Hello from Retrina Framework!',
+            'html_content' => '<strong>Bold HTML content</strong>',
+            'features' => [
+                'MVC Architecture',
+                'Custom Template Engine', 
+                'Middleware Support',
+                'Database ORM',
+                'CLI Commands',
+                'Testing Framework'
+            ],
+            'show_features' => true,
+            'demo_mode' => true,
+            'demo_data' => 'Sample data for isset check'
         ]);
     }
 } 

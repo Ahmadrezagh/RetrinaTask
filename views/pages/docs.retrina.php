@@ -623,7 +623,6 @@ $router->get('/admin', 'AdminController@index', ['admin']);</code></pre>
 php retrina migrate
 php retrina migrate:fresh
 php retrina migrate:fresh --seed
-php retrina migrate:rollback
 
 # Seeding
 php retrina db:seed
@@ -641,6 +640,7 @@ php retrina db:seed --class=UserSeeder</code></pre>
                                 <pre class="bg-light p-3 rounded"><code># Generate files
 php retrina make:model User
 php retrina make:controller UserController
+php retrina make:api-controller ApiController
 php retrina make:migration create_posts_table
 php retrina make:seeder UserSeeder
 php retrina make:view posts.index
@@ -653,18 +653,60 @@ php retrina make:controller PostController -r</code></pre>
                     </div>
                 </div>
                 
-                <div class="card mb-4">
-                    <div class="card-header bg-dark text-white">
-                        <h5 class="mb-0">Development Tools</h5>
-                    </div>
-                    <div class="card-body">
-                        <pre class="bg-light p-3 rounded"><code># Development server
+                <div class="row">
+                    <div class="col-md-12">
+                                        <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0">Development Tools</h5>
+                            </div>
+                            <div class="card-body">
+                                <pre class="bg-light p-3 rounded"><code># Development server
 php retrina serve                    # Default port 8585
 php retrina serve --port=8080        # Custom port
 
 # Utilities
 php retrina route:list               # Show all routes
 php retrina list                     # Show all commands</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0">Testing & Cache</h5>
+                            </div>
+                            <div class="card-body">
+                                <pre class="bg-light p-3 rounded"><code># Testing
+php retrina test                     # Run all tests
+php retrina test --verbose           # Detailed output
+php retrina test tests/Feature/      # Run specific directory
+
+# Cache Management
+php retrina view:clear               # Clear compiled views</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0">Testing & Cache</h5>
+                            </div>
+                            <div class="card-body">
+                                <pre class="bg-light p-3 rounded"><code># Testing
+php retrina test                     # Run all tests
+php retrina test --verbose           # Detailed output
+php retrina test tests/Feature/      # Run specific directory
+
+# Cache Management
+php retrina view:clear               # Clear compiled views</code></pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -698,22 +740,110 @@ $router->group(['middleware' => ['api']], function($router) {
             <section id="testing" class="mb-5">
                 <h2 class="h3 mb-4">🧪 Testing</h2>
                 
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Automated Testing</h5>
+                            </div>
+                            <div class="card-body">
+                                <pre class="bg-light p-3 rounded"><code># Run all tests
+php retrina test
+
+# Run with verbose output
+php retrina test --verbose
+
+# Run specific test directories
+php retrina test tests/Feature/
+php retrina test tests/Api/
+php retrina test tests/Unit/
+
+# Run specific test files
+php retrina test tests/Feature/LoginTest.php</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Test Types</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2"><strong>Feature Tests:</strong> End-to-end testing</p>
+                                <p class="mb-2"><strong>API Tests:</strong> API endpoint testing</p>
+                                <p class="mb-2"><strong>Unit Tests:</strong> Individual component testing</p>
+                                <p class="mb-0"><strong>Web Tests:</strong> UI and form testing</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="card mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">Development Testing</h5>
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Writing Tests</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Feature Test Example</h6>
+                        <pre class="bg-light p-3 rounded"><code>&lt;?php
+// tests/Feature/LoginTest.php
+namespace Tests\Feature;
+
+use Core\Testing\WebTestCase;
+
+class LoginTest extends WebTestCase
+{
+    public function testLoginPage()
+    {
+        $this->visit(\'/login\')
+             ->assertOk()
+             ->assertSee(\'Login\');
+    }
+    
+    public function testSuccessfulLogin()
+    {
+        $this->submitForm(\'/login\', [
+            \'username\' => \'admin\',
+            \'password\' => \'admin123\'
+        ])->assertRedirect(\'/dashboard\');
+    }
+}') !!}</code></pre>
+                        
+                        <h6 class="mt-3">API Test Example</h6>
+                        <pre class="bg-light p-3 rounded"><code>&lt;?php
+// tests/Api/ApiTest.php
+namespace Tests\Api;
+
+use Core\Testing\ApiTestCase;
+
+class ApiTest extends ApiTestCase
+{
+    public function testHealthEndpoint()
+    {
+        $this->get('/api/health')
+             ->assertOk()
+             ->assertJson(['status' => 'ok']);
+    }
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">Manual Testing</h5>
                     </div>
                     <div class="card-body">
                         <pre class="bg-light p-3 rounded"><code># Fresh environment with demo data
 php retrina migrate:fresh --seed
 
 # Test API endpoints
+curl http://localhost:8585/api/health
 curl http://localhost:8585/api/users
-curl -X POST http://localhost:8585/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
 
 # Test authentication
-curl http://localhost:8585/dashboard</code></pre>
+curl -X POST http://localhost:8585/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'</code></pre>
                     </div>
                 </div>
             </section>
