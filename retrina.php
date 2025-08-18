@@ -62,6 +62,7 @@ function printUsage()
     echo COLOR_GREEN . "  make:migration" . COLOR_RESET . "     Create a new migration\n";
     echo COLOR_GREEN . "  make:view" . COLOR_RESET . "          Create a new view\n";
     echo COLOR_GREEN . "  migrate" . COLOR_RESET . "            Run database migrations\n";
+    echo COLOR_GREEN . "  test" . COLOR_RESET . "               Run the test suite\n";
     echo COLOR_GREEN . "  list" . COLOR_RESET . "               List all available commands\n";
     echo COLOR_GREEN . "  help" . COLOR_RESET . "               Show help information\n\n";
     

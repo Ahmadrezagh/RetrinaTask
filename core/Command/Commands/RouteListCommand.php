@@ -56,11 +56,15 @@ Examples:
         // Create a temporary application instance to load routes
         $basePath = dirname(__DIR__, 3);
         
-        // Load Router class
+        // Load required classes with proper autoloading
+        require_once $basePath . '/core/Middleware/MiddlewareManager.php';
         require_once $basePath . '/core/Router.php';
         
-        // Create router instance
-        $router = new Router();
+        // Create middleware manager first
+        $middlewareManager = new \Core\Middleware\MiddlewareManager();
+        
+        // Create router instance with proper dependencies
+        $router = new \Core\Router($middlewareManager);
         
         // Load web routes
         if (file_exists($basePath . '/routes/web.php')) {
@@ -82,12 +86,33 @@ Examples:
                 }
             };
             
-            require $basePath . '/routes/web.php';
+            // Temporarily suppress errors and capture output
+            ob_start();
+            error_reporting(E_ERROR | E_PARSE);
+            
+            try {
+                require $basePath . '/routes/web.php';
+            } catch (\Throwable $e) {
+                // Ignore errors during route loading for listing purposes
+            }
+            
+            ob_end_clean();
+            error_reporting(E_ALL);
         }
         
         // Load API routes
         if (file_exists($basePath . '/routes/api.php')) {
-            require $basePath . '/routes/api.php';
+            ob_start();
+            error_reporting(E_ERROR | E_PARSE);
+            
+            try {
+                require $basePath . '/routes/api.php';
+            } catch (\Throwable $e) {
+                // Ignore errors during route loading for listing purposes
+            }
+            
+            ob_end_clean();
+            error_reporting(E_ALL);
         }
         
         // Store router instance for later use
@@ -108,14 +133,26 @@ Examples:
 
         $formattedRoutes = [];
         
-        // The router stores routes as an array of route objects
+        // The router stores routes with pattern, handler, originalUri, etc.
         foreach ($routes as $route) {
-            $uri = $this->convertPatternToUri($route['uri'], $route['pattern']);
+            $uri = $route['pattern'] ?? '/';
+            $originalUri = $route['originalUri'] ?? '';
+            
+            // Use original URI if available and meaningful, otherwise use pattern
+            if (!empty($originalUri) && $originalUri !== '/') {
+                $uri = $originalUri;
+            }
+            
+            // Ensure URI starts with /
+            if ($uri !== '/' && !str_starts_with($uri, '/')) {
+                $uri = '/' . $uri;
+            }
             
             $formattedRoutes[] = [
                 'method' => strtoupper($route['method']),
                 'uri' => $uri,
-                'action' => $this->formatAction($route['controller'])
+                'action' => $this->formatAction($route['handler']),
+                'middleware' => implode(', ', $route['middleware'] ?? [])
             ];
         }
 
@@ -208,31 +245,34 @@ Examples:
         $methodWidth = max(6, max(array_map(function($r) { return strlen($r['method']); }, $routes)));
         $uriWidth = max(20, max(array_map(function($r) { return strlen($r['uri']); }, $routes)));
         $actionWidth = max(15, max(array_map(function($r) { return strlen($r['action']); }, $routes)));
+        $middlewareWidth = max(10, max(array_map(function($r) { return strlen($r['middleware'] ?? ''); }, $routes)));
 
         // Header
         $this->colored(
             sprintf(
-                "%-{$methodWidth}s  %-{$uriWidth}s  %-{$actionWidth}s",
+                "%-{$methodWidth}s  %-{$uriWidth}s  %-{$actionWidth}s  %-{$middlewareWidth}s",
                 'METHOD',
                 'URI',
-                'ACTION'
+                'ACTION',
+                'MIDDLEWARE'
             ),
             self::COLOR_YELLOW . self::BOLD
         );
 
-        $this->colored(str_repeat('-', $methodWidth + $uriWidth + $actionWidth + 4), self::COLOR_YELLOW);
+        $this->colored(str_repeat('-', $methodWidth + $uriWidth + $actionWidth + $middlewareWidth + 6), self::COLOR_YELLOW);
 
         // Routes
         foreach ($routes as $route) {
             $methodColor = $this->getMethodColor($route['method']);
             
             $this->line(sprintf(
-                "%s%-{$methodWidth}s%s  %-{$uriWidth}s  %-{$actionWidth}s",
+                "%s%-{$methodWidth}s%s  %-{$uriWidth}s  %-{$actionWidth}s  %-{$middlewareWidth}s",
                 $methodColor,
                 $route['method'],
                 self::COLOR_RESET,
                 $route['uri'],
-                $route['action']
+                $route['action'],
+                $route['middleware'] ?? ''
             ));
         }
 
